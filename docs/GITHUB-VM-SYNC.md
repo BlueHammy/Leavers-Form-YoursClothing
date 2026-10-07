@@ -1,60 +1,42 @@
 # GitHub repo and automatic VM deploy
 
-This project can live on GitHub so you edit on your laptop and **push to `main`**; a **self-hosted runner on the VM** builds and syncs to IIS.
+Push to **`main`** from your PC; a **self-hosted runner on the VM** builds and deploys.
 
-## 1. Clone on the VM (first time)
+| VM OS | Runner labels | Repo variable | Workflow |
+|-------|---------------|---------------|----------|
+| **Linux** (current) | `self-hosted`, `Linux`, `leavers-vm-linux` | `LINUX_APP_PATH` e.g. `/opt/leaversform/app` | `deploy-linux-vm.yml` |
+| **Windows IIS** (legacy) | `self-hosted`, `windows`, `leavers-vm` | `IIS_WEB_PATH`, optional `IIS_RUNNER_PATH` | `deploy-windows-vm.yml` |
 
-```powershell
-cd C:\Source   # or your preferred folder
-git clone https://github.com/<your-org-or-user>/Leavers-Form-YoursClothing.git
-cd Leavers-Form-YoursClothing
-```
+Use the **Linux** row for your current VM. Windows IIS setup is frozen on branch **`legacy/windows-iis-working`** — see [BACKUP-WINDOWS-IIS.md](BACKUP-WINDOWS-IIS.md).
 
-Copy secrets locally on the VM only (never commit):
+Full Linux install: **[LINUX-DEPLOYMENT.md](LINUX-DEPLOYMENT.md)**.
 
-- `LeaversForm.Web\appsettings.Production.local.json` (from `deploy\appsettings.Production.local.json.example`)
-- Certificate and IIS setup per [PRODUCTION-DEPLOYMENT.md](PRODUCTION-DEPLOYMENT.md)
+## Linux runner setup (summary)
 
-## 2. Self-hosted runner on the VM
+1. GitHub → **Settings → Actions → Runners → New self-hosted runner → Linux**.
+2. Install on the VM; add label **`leavers-vm-linux`**.
+3. **Settings → Actions → Variables** → `LINUX_APP_PATH` = `/opt/leaversform/app`.
+4. Complete one-time install per [LINUX-DEPLOYMENT.md](LINUX-DEPLOYMENT.md) (nginx, systemd, secrets).
 
-1. On GitHub: **Repo → Settings → Actions → Runners → New self-hosted runner → Windows**.
-2. Follow GitHub’s install commands on the VM (download, configure, run as a service).
-3. When configuring, add an extra label: **`leavers-vm`** (the deploy workflow expects `self-hosted`, `windows`, `leavers-vm`).
-
-## 3. Repository variables (GitHub)
-
-**Settings → Secrets and variables → Actions → Variables**
-
-| Variable | Example |
-|----------|---------|
-| `IIS_WEB_PATH` | `C:\inetpub\LeaversForm\Web` |
-| `IIS_RUNNER_PATH` | `C:\inetpub\LeaversForm\Runner` (optional) |
-
-The workflow **does not** overwrite `appsettings.Production.local.json` on the server.
-
-## 4. Day-to-day workflow
-
-On your dev machine:
+## Day-to-day
 
 ```powershell
 git add -A
-git commit -m "Describe your change"
+git commit -m "Your change"
 git push origin main
 ```
 
-GitHub Actions runs on the VM, publishes Release, robocopy-syncs to IIS, and recycles the **LeaversForm** app pool.
+Check **Actions** → **Deploy to Linux VM**.
 
-## 5. Manual pull (without Actions)
+## Manual pull (no Actions)
 
-If you only want git sync and will publish yourself:
-
-```powershell
+```bash
 git pull origin main
-.\deploy\publish-production.ps1 -OutputPath C:\Deploy\LeaversForm
-# then copy outputs and recycle IIS per PRODUCTION-DEPLOYMENT.md
+./deploy/linux/publish-local.sh /opt/leaversform/app
+sudo systemctl restart leaversform
 ```
 
 ## Security
 
-- `.gitignore` excludes `appsettings.*.local.json` and `*.db`.
-- Do not commit Entra client secrets, certificates, or PFX files.
+- `.gitignore` excludes `appsettings.*.local.json`, `*.pfx`, and `*.db`.
+- Never commit Entra secrets or certificates.

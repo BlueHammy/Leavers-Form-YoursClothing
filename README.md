@@ -2,13 +2,17 @@
 
 LeaversForm is an ASP.NET Core 8 Razor Pages application for submitting, reviewing and safely processing leaver requests. It includes SQLite development storage, SQL Server production support, Microsoft Graph user search/email, audit logging, Excel export, in-app IT operations, and a PowerShell offboarding script (`LeaverProcess.ps1`).
 
+**Production:** **`main`** targets **Linux** (systemd + nginx). The last **Windows IIS** snapshot is on branch [`legacy/windows-iis-working`](docs/BACKUP-WINDOWS-IIS.md) (tag `windows-iis-v1`).
+
 ## Documentation
 
 | Document | Audience | Contents |
 |----------|----------|----------|
 | **[IT Operations Guide (HTML)](docs/LeaversForm-IT-Guide.html)** | IT / support | Architecture, statuses, Processing settings, diagnostics, troubleshooting, go-live |
 | **[Production deployment](docs/PRODUCTION-DEPLOYMENT.md)** | Server install | IIS, Entra, firewall, secrets, checklist |
-| **[GitHub → VM sync](docs/GITHUB-VM-SYNC.md)** | Developers / IT | Clone, self-hosted runner, auto-deploy on push |
+| **[Linux deployment](docs/LINUX-DEPLOYMENT.md)** | Server install | systemd, nginx, pwsh, secrets, go-live |
+| **[Windows IIS backup](docs/BACKUP-WINDOWS-IIS.md)** | IT | Frozen branch/tag before Linux migration |
+| **[GitHub → VM sync](docs/GITHUB-VM-SYNC.md)** | Developers / IT | Self-hosted runner, auto-deploy on push |
 | **[Semi-live testing](docs/SEMI-LIVE-TESTING.md)** | Developers | Real Entra SSO on localhost / LAN |
 
 Open the IT guide in a browser and print to PDF if you need a printable handbook.

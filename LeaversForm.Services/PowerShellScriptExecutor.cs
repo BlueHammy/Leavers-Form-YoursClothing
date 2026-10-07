@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using LeaversForm.Data.Entities;
@@ -8,6 +9,7 @@ namespace LeaversForm.Services;
 
 public sealed class PowerShellScriptExecutor(
     IOptions<LeaversFormOptions> options,
+    IConfiguration configuration,
     ILeaversFormProcessingModeService processingMode,
     ILeaverScriptExecutionTracker executionTracker,
     ILogger<PowerShellScriptExecutor> logger) : IPowerShellScriptExecutor
@@ -116,21 +118,43 @@ public sealed class PowerShellScriptExecutor(
             throw new InvalidOperationException("LeaversForm:PowerShellCertificateThumbprint is not configured.");
 
         var clean = thumbprint.Replace(" ", string.Empty, StringComparison.Ordinal);
-        var cert = FindCertificate(StoreLocation.CurrentUser, clean)
+        var cert = TryLoadCertificateFromFile(clean) ?? FindCertificate(StoreLocation.CurrentUser, clean)
             ?? FindCertificate(StoreLocation.LocalMachine, clean);
 
         if (cert is null)
         {
+            var hint = OperatingSystem.IsWindows()
+                ? "Run .\\Repair-LiveProcessingCertificate.ps1 to import the .pfx backup, or .\\Initialize-LiveProcessingTest.ps1 -RecreateCertificate to create a new cert."
+                : "Set LeaversForm:PowerShellCertificatePath to your automation .pfx and LeaversForm__PowerShellCertificatePassword in the environment.";
             throw new InvalidOperationException(
-                $"Certificate thumbprint {thumbprint} was not found in Cert:\\CurrentUser\\My or Cert:\\LocalMachine\\My. " +
-                "The .cer file in .live-processing-test is for Entra upload only — it does not contain the private key. " +
-                "Run .\\Repair-LiveProcessingCertificate.ps1 to import the .pfx backup, or .\\Initialize-LiveProcessingTest.ps1 -RecreateCertificate to create a new cert.");
+                $"Certificate thumbprint {thumbprint} was not found. {hint}");
         }
 
         logger.LogInformation(
             "Using certificate {Subject} (expires {Expiry:yyyy-MM-dd})",
             cert.Subject,
             cert.NotAfter);
+    }
+
+    private X509Certificate2? TryLoadCertificateFromFile(string expectedThumbprint)
+    {
+        var path = options.Value.PowerShellCertificatePath;
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return null;
+
+        var password = configuration["LeaversForm:PowerShellCertificatePassword"];
+        var cert = string.IsNullOrEmpty(password)
+            ? new X509Certificate2(path)
+            : new X509Certificate2(path, password);
+
+        var actual = cert.Thumbprint?.Replace(" ", string.Empty, StringComparison.Ordinal);
+        if (!string.Equals(actual, expectedThumbprint, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                $"Certificate at {path} has thumbprint {cert.Thumbprint}, expected {expectedThumbprint}.");
+        }
+
+        return cert;
     }
 
     private static X509Certificate2? FindCertificate(StoreLocation location, string thumbprint)

@@ -7,6 +7,13 @@ public static class LeaversFormPaths
 {
     public static void Configure(LeaversFormOptions options, IHostEnvironment environment)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            if (string.IsNullOrWhiteSpace(options.PowerShellExecutable)
+                || options.PowerShellExecutable.Equals("pwsh.exe", StringComparison.OrdinalIgnoreCase))
+                options.PowerShellExecutable = "pwsh";
+        }
+
         string scriptsDir;
         string logsDir;
 
@@ -50,7 +57,9 @@ public static class LeaversFormPaths
     private static bool ShouldReplaceLegacyPath(string? path) =>
         string.IsNullOrWhiteSpace(path)
         || path.StartsWith("C:\\Scripts", StringComparison.OrdinalIgnoreCase)
-        || path.StartsWith("C:\\Logs", StringComparison.OrdinalIgnoreCase);
+        || path.StartsWith("C:\\Logs", StringComparison.OrdinalIgnoreCase)
+        || path.StartsWith("/opt/leaversform/scripts", StringComparison.Ordinal)
+        || path.StartsWith("/var/log/leaversform", StringComparison.Ordinal);
 
     private static void SyncBundledScript(IHostEnvironment environment, string destinationPath)
     {

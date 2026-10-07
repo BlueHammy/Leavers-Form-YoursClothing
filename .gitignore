@@ -10,6 +10,8 @@ obj/
 ## Secrets
 appsettings.*.local.json
 secrets.json
+*.pfx
+*.p12
 
 .lan-test/
 .live-processing-test/

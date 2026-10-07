@@ -1,0 +1,17 @@
+[Unit]
+Description=LeaversForm (ASP.NET Core)
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/leaversform/app
+ExecStart=/usr/bin/dotnet /opt/leaversform/app/LeaversForm.Web.dll
+Restart=always
+RestartSec=10
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5044
+# PFX password — set in /etc/systemd/system/leaversform.service.d/override.conf
+# Environment=LeaversForm__PowerShellCertificatePassword=...
+
+[Install]
+WantedBy=multi-user.target

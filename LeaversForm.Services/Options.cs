@@ -23,6 +23,8 @@ public sealed class LeaversFormOptions
     public string PowerShellTenantId { get; set; } = string.Empty;
     public string PowerShellAppId { get; set; } = string.Empty;
     public string PowerShellCertificateThumbprint { get; set; } = string.Empty;
+    /// <summary>Linux/production: path to automation PFX (private key). Password via env LeaversForm__PowerShellCertificatePassword.</summary>
+    public string PowerShellCertificatePath { get; set; } = string.Empty;
     public string PowerShellExchangeOrganization { get; set; } = string.Empty;
     public string PowerShellDomainController { get; set; } = string.Empty;
     public string LogFolderPath { get; set; } = "logs";

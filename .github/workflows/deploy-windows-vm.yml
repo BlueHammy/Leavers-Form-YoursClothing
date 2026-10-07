@@ -1,7 +1,6 @@
-# Deploys to a Windows VM when you push to main.
-# Setup: install a self-hosted GitHub Actions runner on the VM with labels:
-#   self-hosted, windows, leavers-vm
-# See docs/GITHUB-VM-SYNC.md
+# Legacy Windows IIS deploy (frozen app code: branch legacy/windows-iis-working).
+# Linux production uses deploy-linux-vm.yml instead.
+# Runner labels: self-hosted, windows, leavers-vm — see docs/GITHUB-VM-SYNC.md
 
 name: Deploy to Windows VM
 

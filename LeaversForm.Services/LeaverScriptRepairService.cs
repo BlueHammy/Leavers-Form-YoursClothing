@@ -14,6 +14,12 @@ public sealed class LeaverScriptRepairService(
 {
     public async Task<bool> TryRepairEnvironmentAsync(CancellationToken cancellationToken = default)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            logger.LogInformation("Module repair is only available on Windows hosts.");
+            return false;
+        }
+
         var settings = options.Value;
         var repairScript = ResolveRepairScriptPath(settings);
         if (repairScript is null)

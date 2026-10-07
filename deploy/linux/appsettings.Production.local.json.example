@@ -1,0 +1,27 @@
+{
+  "AzureAd": {
+    "TenantId": "YOUR-TENANT-ID",
+    "ClientId": "YOUR-WEB-APP-CLIENT-ID",
+    "ClientSecret": "YOUR-WEB-CLIENT-SECRET"
+  },
+  "Graph": {
+    "ItCcAddress": "IT@yoursclothing.co.uk",
+    "HrCcAddress": "HR@yoursclothing.co.uk",
+    "ErrorAlertMailbox": "it@yoursclothing.co.uk",
+    "RedirectAllEmailsTo": ""
+  },
+  "LeaversForm": {
+    "BaseUrl": "https://leavers.internal.example.com",
+    "ScriptTestMode": true,
+    "PowerShellScriptPath": "/opt/leaversform/scripts/LeaverProcess.ps1",
+    "PowerShellWorkingDirectory": "/opt/leaversform/scripts",
+    "PowerShellExecutable": "pwsh",
+    "PowerShellTenantId": "YOUR-TENANT-ID",
+    "PowerShellAppId": "YOUR-AUTOMATION-APP-ID",
+    "PowerShellCertificateThumbprint": "YOUR-CERT-THUMBPRINT",
+    "PowerShellCertificatePath": "/etc/leaversform/secrets/automation.pfx",
+    "PowerShellExchangeOrganization": "yoursclothing.onmicrosoft.com",
+    "PowerShellDomainController": "YOUR-DC.yours.local",
+    "LogFolderPath": "/var/log/leaversform"
+  }
+}

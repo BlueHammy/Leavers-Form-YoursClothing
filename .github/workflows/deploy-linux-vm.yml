@@ -1,0 +1,39 @@
+# Deploys to a Linux VM when you push to main.
+# Runner labels: self-hosted, Linux, leavers-vm-linux
+# Variable: LINUX_APP_PATH (e.g. /opt/leaversform/app)
+# See docs/LINUX-DEPLOYMENT.md
+
+name: Deploy to Linux VM
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, leavers-vm-linux]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish
+        run: |
+          APP="${{ vars.LINUX_APP_PATH }}"
+          if [ -z "$APP" ]; then
+            echo "Set repository variable LINUX_APP_PATH (e.g. /opt/leaversform/app)"
+            exit 1
+          fi
+          chmod +x deploy/linux/publish-local.sh
+          ./deploy/linux/publish-local.sh "$APP"
+
+      - name: Preserve server secrets
+        run: |
+          APP="${{ vars.LINUX_APP_PATH }}"
+          SECRETS="/etc/leaversform/secrets/appsettings.Production.local.json"
+          if [ -f "$SECRETS" ]; then
+            cp "$SECRETS" "$APP/appsettings.Production.local.json"
+          fi
+
+      - name: Restart service
+        run: sudo systemctl restart leaversform

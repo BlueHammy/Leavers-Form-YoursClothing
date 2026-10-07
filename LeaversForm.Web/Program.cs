@@ -32,6 +32,9 @@ else if (builder.Environment.IsProduction())
         builder.Configuration.AddJsonFile("appsettings.Production.local.json", optional: true, reloadOnChange: true);
 }
 
+if (!OperatingSystem.IsWindows() && File.Exists(Path.Combine(builder.Environment.ContentRootPath, "appsettings.Linux.json")))
+    builder.Configuration.AddJsonFile("appsettings.Linux.json", optional: true, reloadOnChange: true);
+
 var lanTestLocal = Path.Combine(builder.Environment.ContentRootPath, "appsettings.LanTest.local.json");
 if (File.Exists(lanTestLocal))
     builder.Configuration.AddJsonFile("appsettings.LanTest.local.json", optional: true, reloadOnChange: true);
