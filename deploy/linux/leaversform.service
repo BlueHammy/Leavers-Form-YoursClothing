@@ -5,6 +5,7 @@ After=network.target
 [Service]
 WorkingDirectory=/opt/leaversform/app
 ExecStart=/usr/bin/dotnet /opt/leaversform/app/LeaversForm.Web.dll
+# If dotnet is elsewhere, use: which dotnet
 Restart=always
 RestartSec=10
 User=www-data

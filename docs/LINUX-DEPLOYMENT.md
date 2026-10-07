@@ -12,8 +12,14 @@ For the frozen Windows/IIS version, use branch **`legacy/windows-iis-working`** 
 - Clone: `git clone https://github.com/BlueHammy/Leavers-Form-YoursClothing.git`
 
 ```bash
-# Example (Ubuntu) — see deploy/linux/install-prerequisites.sh
+# Ubuntu 22.04 — installs .NET 8 SDK (required for publish), runtime, nginx, pwsh
 sudo ./deploy/linux/install-prerequisites.sh
+```
+
+**`dotnet: command not found`** — run the install script above (publish needs the **SDK**, not runtime only). Then `git pull` and retry `./deploy/linux/publish-local.sh`. Writing to `/opt/leaversform/app` may need:
+
+```bash
+sudo ./deploy/linux/publish-local.sh /opt/leaversform/app
 ```
 
 ## 2. Layout
