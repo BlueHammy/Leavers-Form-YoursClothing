@@ -1,0 +1,21 @@
+# Copy this file to the server and fill in values. DO NOT commit filled-in secrets to git.
+# Store as appsettings.Production.local.json (gitignored) or set equivalent environment variables.
+
+{
+  "AzureAd": {
+    "TenantId": "00000000-0000-0000-0000-000000000000",
+    "ClientId": "00000000-0000-0000-0000-000000000000",
+    "ClientSecret": "PASTE_CLIENT_SECRET_HERE"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=SQLSERVER\\SQLEXPRESS;Database=LeaversForm;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=True"
+  },
+  "LeaversForm": {
+    "BaseUrl": "https://leavers.internal.yoursclothing.co.uk",
+    "PowerShellTenantId": "00000000-0000-0000-0000-000000000000",
+    "PowerShellAppId": "00000000-0000-0000-0000-000000000000",
+    "PowerShellCertificateThumbprint": "CERTIFICATE_THUMBPRINT",
+    "PowerShellExchangeOrganization": "yoursclothing.onmicrosoft.com",
+    "PowerShellDomainController": "sh-dc-01.yours.local"
+  }
+}

@@ -1,0 +1,153 @@
+@page "{id:int}"
+@model LeaversForm.Web.Pages.Leavers.DetailsModel
+@using LeaversForm.Data.Enums
+@using LeaversForm.Services
+@{
+    ViewData["Title"] = Model.Request is null ? "Request details" : $"Request for {Model.Request.LeaverDisplayName}";
+}
+
+@if (Model.Request is null)
+{
+    <div class="card"><p>Request not found.</p><a asp-page="List">Back to requests</a></div>
+}
+else
+{
+    var r = Model.Request;
+    var statusLabel = LeaverStatusDisplay.ToLabel(r.Status);
+    <div class="card" id="leaver-details" data-request-id="@r.Id" data-pending="@(r.Status == LeaverStatus.Pending ? "true" : "false")">
+        <p><a asp-page="List">← Back to requests</a></p>
+        <h1>@r.LeaverDisplayName</h1>
+        <div class="status-block">
+            <p class="status-headline">
+                <strong data-status-label>@statusLabel</strong>
+                @if (r.DisableAsap) { <span class="asap-badge">Urgent</span> }
+            </p>
+            @if (!string.IsNullOrWhiteSpace(Model.StatusDetail))
+            {
+                <p class="status-detail-line" data-status-detail>@Model.StatusDetail</p>
+            }
+        </div>
+        @if (r.Status == LeaverStatus.AwaitingApproval)
+        {
+            <div class="notice-box">This request is waiting for approval. The leaver&apos;s account will not be switched off until IT, an admin, or an authorising manager approves it.</div>
+        }
+        @if (Model.IsAuthorisingManagerView && !Model.CanApprove)
+        {
+            <div class="notice-box">You are viewing this request as an authorising manager (read-only).</div>
+        }
+        @if (Model.HasScriptTestModeSkipped)
+        {
+            <div class="notice-box">This request was not processed — test mode was on at the time.</div>
+        }
+        @if (r.Status == LeaverStatus.Failed && !string.IsNullOrWhiteSpace(Model.FailureGuidance))
+        {
+            <div class="failed-note failure-panel">
+                <strong>What happened</strong>
+                <p>@Model.FailureGuidance</p>
+                <p class="muted">If you need this resolved quickly, contact IT and quote the reference above.</p>
+            </div>
+        }
+        <dl>
+            @if (Model.ShowTechnicalFields)
+            {
+                <dt>Sign-in name</dt><dd>@r.LeaverUserPrincipalName</dd>
+            }
+            <dt>Work email</dt><dd>@r.LeaverEmail</dd>
+            <dt>Department</dt><dd>@r.Department</dd>
+            <dt>Leaving date</dt><dd>@r.LeavingDate.ToString("dd/MM/yyyy")</dd>
+            <dt>Equipment to be returned</dt><dd class="pre-line">@r.EquipmentNotes</dd>
+            @if (!string.IsNullOrWhiteSpace(r.SpecialRequests))
+            {
+                <dt>Special requests</dt><dd class="pre-line">@r.SpecialRequests</dd>
+            }
+            <dt>Submitted by</dt><dd>@r.SubmittedByName on @r.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+
+        @if (Model.CanEdit || Model.CanCancel || Model.CanRetry || Model.CanApprove)
+        {
+            <div class="details-actions">
+                @if (Model.CanApprove)
+                {
+                    <div class="warning-box"><strong>Approval required:</strong> Review the details below carefully before approving. The account will not be switched off until you approve.</div>
+                    <a class="btn btn-accent" asp-page="Approve" asp-route-id="@r.Id">Approve request</a>
+                }
+                @if (Model.CanCancel)
+                {
+                    <div class="warning-box"><strong>Important:</strong> Cancelling stops this request from being processed. Only cancel if that is intended.</div>
+                }
+                @if (Model.CanEdit)
+                {
+                    <a class="btn" asp-page="Edit" asp-route-id="@r.Id">Edit leaving date</a>
+                }
+                @if (Model.CanCancel)
+                {
+                    <a class="btn btn-danger" asp-page="Cancel" asp-route-id="@r.Id">Cancel request</a>
+                }
+                @if (Model.CanRetry)
+                {
+                    <form method="post" asp-page="Retry" asp-route-id="@r.Id" style="display:inline">
+                        <button class="btn btn-accent" type="submit">Try again</button>
+                    </form>
+                }
+            </div>
+        }
+
+        @if (Model.ShowDiagnostics)
+        {
+            <details class="diagnostics-panel">
+                <summary>Diagnostics (super user)</summary>
+                @if (!string.IsNullOrWhiteSpace(Model.PlatformStatusSummary))
+                {
+                    <p><strong>Platform status:</strong> @Model.PlatformStatusSummary</p>
+                }
+                @if (r.Status == LeaverStatus.Pending)
+                {
+                    <p><strong>Script process active:</strong> @(Model.ScriptProcessActive ? "yes" : "no")</p>
+                }
+                <p><strong>Log paths</strong></p>
+                <ul class="ops-config-list">
+                    <li>Offboarding: @(string.IsNullOrWhiteSpace(Model.OffboardingLogPath) ? "none yet" : Model.OffboardingLogPath)</li>
+                    <li>Summary: @(string.IsNullOrWhiteSpace(Model.ExecutionLogPath) ? "none yet" : Model.ExecutionLogPath)</li>
+                </ul>
+                <p>
+                    @if (!string.IsNullOrWhiteSpace(Model.OffboardingLogPath))
+                    {
+                        <a class="btn" asp-page-handler="DownloadLog" asp-route-id="@r.Id" asp-route-type="offboarding">Download offboarding log</a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ExecutionLogPath))
+                    {
+                        <a class="btn" asp-page-handler="DownloadLog" asp-route-id="@r.Id" asp-route-type="summary">Download summary log</a>
+                    }
+                    @if (Model.CanReconcile)
+                    {
+                        <form method="post" asp-page-handler="Reconcile" asp-route-id="@r.Id" style="display:inline" onsubmit="return confirm('Fix this request now?');">
+                            <button class="btn btn-accent" type="submit">Fix stuck request</button>
+                        </form>
+                    }
+                </p>
+                @if (Model.AuditTimeline.Count > 0)
+                {
+                    <p><strong>Audit timeline</strong></p>
+                    <ul class="audit-timeline">
+                        @foreach (var entry in Model.AuditTimeline)
+                        {
+                            <li>
+                                <strong>@entry.Action</strong>
+                                — @entry.PerformedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                by @entry.PerformedByName
+                                @if (!string.IsNullOrWhiteSpace(entry.Notes))
+                                {
+                                    <br /><span class="muted">@entry.Notes</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+            </details>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/leaver-details.js" asp-append-version="true"></script>
+}

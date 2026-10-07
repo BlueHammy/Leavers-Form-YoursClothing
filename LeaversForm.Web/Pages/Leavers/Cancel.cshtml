@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model LeaversForm.Web.Pages.Leavers.CancelModel
+@{ ViewData["Title"] = "Cancel request"; }
+<div class="card">
+    <h1>Cancel @Model.Request?.LeaverDisplayName?</h1>
+    @if (Model.Request?.Status == LeaversForm.Data.Enums.LeaverStatus.Pending)
+    {
+        <div class="warning-box">
+            This request is currently processing. We will try to stop it if it is already running —
+            check with IT if you are unsure whether the account was switched off.
+        </div>
+    }
+    else
+    {
+        <p class="muted">This will stop the leaver request from being processed.</p>
+    }
+    <form method="post">
+        <button class="btn btn-danger" type="submit">Confirm cancellation</button>
+        <a asp-page="Details" asp-route-id="@Model.Request?.Id">Keep request</a>
+    </form>
+</div>

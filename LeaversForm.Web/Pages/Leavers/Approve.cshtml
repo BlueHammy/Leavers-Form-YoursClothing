@@ -1,0 +1,32 @@
+@page "{id:int}"
+@model LeaversForm.Web.Pages.Leavers.ApproveModel
+@{
+    ViewData["Title"] = "Approve leaver request";
+}
+
+@if (Model.Request is null)
+{
+    <div class="card"><p>Request not found.</p><a asp-page="List">Back to requests</a></div>
+}
+else
+{
+    var r = Model.Request;
+    <div class="card">
+        <p><a asp-page="Details" asp-route-id="@r.Id">← Back to request</a></p>
+        <h1>Approve leaver request</h1>
+        <p>You are about to approve the leaver request for <strong>@r.LeaverDisplayName</strong>.</p>
+        <div class="warning-box">
+            <strong>Important:</strong> Once approved, their account will be switched off
+            @(r.DisableAsap ? " immediately" : $" at 5:00 PM UK on {r.LeavingDate:dd/MM/yyyy}").
+            Only approve if you are satisfied this request is correct.
+        </div>
+        <dl>
+            <dt>Leaving date</dt><dd>@r.LeavingDate.ToString("dd/MM/yyyy")</dd>
+            <dt>Submitted by</dt><dd>@r.SubmittedByName</dd>
+        </dl>
+        <form method="post">
+            <button class="btn btn-accent" type="submit">Approve request</button>
+            <a class="btn" asp-page="Details" asp-route-id="@r.Id">Cancel</a>
+        </form>
+    </div>
+}

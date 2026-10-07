@@ -1,0 +1,445 @@
+@page
+
+@model LeaversForm.Web.Pages.Leavers.CreateModel
+
+@{ ViewData["Title"] = "Submit a leaver"; }
+
+<div class="card form-card">
+
+    <h1>Submit a leaver</h1>
+
+    <p class="form-intro muted">Who is leaving → when → what equipment comes back → submit.</p>
+
+    <p class="muted">Search for the colleague who is leaving (name or email) and select them from the suggestions.</p>
+
+
+
+    <div asp-validation-summary="All" class="validation-summary"></div>
+
+
+
+    <form method="post" class="leaver-form" novalidate>
+
+        <div class="form-field">
+
+            <label class="required" for="userSearch">Leaver</label>
+
+            <div class="search-wrap">
+
+                <input asp-for="Input.LeaverSearchText" id="userSearch" autocomplete="off" placeholder="Search name or email" />
+
+                <div id="suggestions" class="suggestions"></div>
+
+            </div>
+
+            <div id="selectedLeaverChip" class="selected-leaver-chip" hidden>
+
+                <span>Selected: <strong id="selectedLeaverName"></strong></span>
+
+                <button type="button" class="btn-link" id="changeLeaverBtn">Change leaver</button>
+
+            </div>
+
+            <input asp-for="Input.LeaverEntraId" type="hidden" id="entraId" data-val="false" />
+
+            <input asp-for="Input.LeaverDisplayName" type="hidden" id="displayName" data-val="false" />
+
+            <input asp-for="Input.LeaverUserPrincipalName" type="hidden" id="upn" data-val="false" />
+
+            <input asp-for="Input.LeaverEmail" type="hidden" id="email" data-val="false" />
+
+            <input asp-for="Input.Department" type="hidden" id="department" data-val="false" />
+
+            <input asp-for="Input.SamAccountName" type="hidden" id="samAccountName" data-val="false" />
+
+            <span asp-validation-for="Input.LeaverSearchText" class="field-validation-error"></span>
+
+            <span asp-validation-for="Input.LeaverEntraId" class="field-validation-error"></span>
+
+        </div>
+
+
+
+        <div class="form-field">
+
+            <label asp-for="Input.LeavingDate" class="required"></label>
+
+            <input asp-for="Input.LeavingDate" type="date" class="date-input" />
+
+            <p class="field-help">Their account will be switched off at <strong>5:00 PM UK</strong> on this date.</p>
+
+            <span asp-validation-for="Input.LeavingDate" class="field-validation-error"></span>
+
+        </div>
+
+
+
+        <div class="form-field">
+
+            <label class="required">Equipment to be returned</label>
+
+            <p class="equipment-help">List laptops, iPads, and other high-value kit. Screens and keyboards do not need listing — explain gaps in "Anything else?" if needed.</p>
+
+            <div class="manager-grid">
+
+                @foreach (var item in CreateModel.EquipmentOptions)
+
+                {
+
+                    var isChecked = Model.Input.EquipmentItems.Contains(item);
+
+                    <label class="manager-option">
+
+                        <input type="checkbox" name="Input.EquipmentItems" value="@item" @(isChecked ? "checked" : null) />
+
+                        <span class="manager-label">@item</span>
+
+                    </label>
+
+                }
+
+            </div>
+
+            <span asp-validation-for="Input.EquipmentItems" class="field-validation-error"></span>
+
+
+
+            <label asp-for="Input.AnythingElse" class="equipment-anything-label">Anything else?</label>
+
+            <textarea asp-for="Input.AnythingElse" rows="3" placeholder="Other equipment, or explain why an item is not being returned"></textarea>
+
+            <span asp-validation-for="Input.AnythingElse" class="field-validation-error"></span>
+
+        </div>
+
+
+
+        <div class="form-field">
+
+            <label class="required">Authorising managers</label>
+            <p class="field-help">These people get an email for awareness.</p>
+
+            <div class="manager-grid">
+
+                @foreach (var manager in Model.Managers)
+
+                {
+
+                    var isChecked = Model.Input.ManagerIds.Contains(manager.Id);
+
+                    <label class="manager-option">
+
+                        <input type="checkbox" name="Input.ManagerIds" value="@manager.Id" @(isChecked ? "checked" : null) />
+
+                        <span class="manager-label">@manager.DisplayName</span>
+
+                    </label>
+
+                }
+
+            </div>
+
+            <span asp-validation-for="Input.ManagerIds" class="field-validation-error"></span>
+
+        </div>
+
+
+
+        <div class="form-field">
+
+            <label asp-for="Input.SpecialRequests"></label>
+
+            <textarea asp-for="Input.SpecialRequests" rows="3" placeholder="Optional"></textarea>
+
+        </div>
+
+
+
+        @if (Model.CanDisableAsap)
+        {
+            <div class="form-field">
+                <label class="manager-option asap-option">
+                    <input type="checkbox" asp-for="Input.DisableAsap" data-val="false" />
+                    <span class="manager-label">Switch off their account IMMEDIATELY (IT admins only)</span>
+                </label>
+                <p class="field-help">Otherwise their account is switched off at 5:00 PM UK on the leaving date.</p>
+            </div>
+        }
+
+        <div class="form-actions">
+
+            <button class="btn btn-accent" type="submit" id="submitBtn">Submit request</button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const box = document.getElementById('userSearch');
+
+        const list = document.getElementById('suggestions');
+
+        const chip = document.getElementById('selectedLeaverChip');
+
+        const selectedName = document.getElementById('selectedLeaverName');
+
+        const changeLeaverBtn = document.getElementById('changeLeaverBtn');
+
+        const submitBtn = document.getElementById('submitBtn');
+
+        let timer;
+
+        let leaverLocked = false;
+
+
+
+        const form = document.querySelector('.leaver-form');
+
+
+
+        function clearSelectedLeaver() {
+
+            document.getElementById('entraId').value = '';
+
+            document.getElementById('displayName').value = '';
+
+            document.getElementById('upn').value = '';
+
+            document.getElementById('email').value = '';
+
+            document.getElementById('department').value = '';
+
+            document.getElementById('samAccountName').value = '';
+
+            leaverLocked = false;
+
+            chip.hidden = true;
+
+            box.disabled = false;
+
+            box.value = '';
+
+            box.focus();
+
+        }
+
+
+
+        function setSelectedLeaver(user) {
+
+            box.value = user.displayName;
+
+            document.getElementById('entraId').value = user.id;
+
+            document.getElementById('displayName').value = user.displayName;
+
+            document.getElementById('upn').value = user.upn;
+
+            document.getElementById('email').value = user.mail || user.upn;
+
+            document.getElementById('department').value = user.dept || '';
+
+            document.getElementById('samAccountName').value = user.sam || '';
+
+            selectedName.textContent = user.displayName;
+
+            chip.hidden = false;
+
+            leaverLocked = true;
+
+            box.disabled = true;
+
+            list.innerHTML = '';
+
+        }
+
+
+
+        changeLeaverBtn.addEventListener('click', clearSelectedLeaver);
+
+
+
+        form.addEventListener('submit', (event) => {
+
+            if (!document.getElementById('entraId').value) {
+
+                event.preventDefault();
+
+                box.focus();
+
+                list.innerHTML = '<div class="suggestion muted">Select a user from the suggestions before submitting.</div>';
+
+                return;
+
+            }
+
+
+
+            submitBtn.disabled = true;
+
+            submitBtn.textContent = 'Submitting…';
+
+        });
+
+
+
+        box.addEventListener('input', () => {
+
+            if (leaverLocked) {
+
+                return;
+
+            }
+
+
+
+            clearTimeout(timer);
+
+            timer = setTimeout(async () => {
+
+                if (box.value.length < 2) {
+
+                    list.innerHTML = '';
+
+                    return;
+
+                }
+
+
+
+                list.innerHTML = '<div class="suggestion muted">Searching…</div>';
+
+                try {
+
+                    const response = await fetch('/api/users/search?q=' + encodeURIComponent(box.value), {
+
+                        headers: { 'Accept': 'application/json' }
+
+                    });
+
+                    if (!response.ok) {
+
+                        throw new Error(`Search failed (${response.status})`);
+
+                    }
+
+
+
+                    const users = await response.json();
+
+                    if (!users.length) {
+
+                        list.innerHTML = '<div class="suggestion muted">No matching active users found. Some accounts may be excluded from search.</div>';
+
+                        return;
+
+                    }
+
+
+
+                    list.replaceChildren(...users.map(u => {
+
+                        const item = document.createElement('div');
+
+                        item.className = 'suggestion';
+
+                        item.innerHTML = `<b></b><br><small></small>`;
+
+                        item.querySelector('b').textContent = u.displayName;
+
+                        item.querySelector('small').textContent = `${u.mail || u.userPrincipalName}${u.department ? ` · ${u.department}` : ''}`;
+
+                        item.onclick = () => setSelectedLeaver({
+
+                            id: u.id,
+
+                            displayName: u.displayName,
+
+                            upn: u.userPrincipalName,
+
+                            mail: u.mail || '',
+
+                            dept: u.department || '',
+
+                            sam: u.onPremisesSamAccountName || ''
+
+                        });
+
+                        return item;
+
+                    }));
+
+                } catch (error) {
+
+                    console.error('Entra user search failed', error);
+
+                    list.innerHTML = '<div class="suggestion muted">User search is temporarily unavailable.</div>';
+
+                }
+
+            }, 250);
+
+        });
+
+
+
+        document.querySelectorAll('input[name="Input.EquipmentItems"]').forEach(item => {
+
+            item.addEventListener('change', () => {
+
+                if (item.value === 'None' && item.checked) {
+
+                    document.querySelectorAll('input[name="Input.EquipmentItems"]').forEach(other => {
+
+                        if (other !== item) other.checked = false;
+
+                    });
+
+                } else if (item.checked) {
+
+                    const none = document.querySelector('input[name="Input.EquipmentItems"][value="None"]');
+
+                    if (none) none.checked = false;
+
+                }
+
+            });
+
+        });
+
+
+
+        if (document.getElementById('entraId').value && document.getElementById('displayName').value) {
+
+            setSelectedLeaver({
+
+                id: document.getElementById('entraId').value,
+
+                displayName: document.getElementById('displayName').value,
+
+                upn: document.getElementById('upn').value,
+
+                mail: document.getElementById('email').value,
+
+                dept: document.getElementById('department').value,
+
+                sam: document.getElementById('samAccountName').value
+
+            });
+
+        }
+
+    </script>
+
+}
+
+

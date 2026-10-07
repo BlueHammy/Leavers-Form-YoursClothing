@@ -1,0 +1,52 @@
+# Deploys to a Windows VM when you push to main.
+# Setup: install a self-hosted GitHub Actions runner on the VM with labels:
+#   self-hosted, windows, leavers-vm
+# See docs/GITHUB-VM-SYNC.md
+
+name: Deploy to Windows VM
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows, leavers-vm]
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish Release build
+        run: |
+          ./deploy/publish-production.ps1 -OutputPath "${{ runner.temp }}\LeaversForm-publish"
+
+      - name: Deploy to IIS folder
+        env:
+          IIS_WEB_PATH: ${{ vars.IIS_WEB_PATH }}
+          IIS_RUNNER_PATH: ${{ vars.IIS_RUNNER_PATH }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:IIS_WEB_PATH)) {
+            throw "Set repository variable IIS_WEB_PATH (e.g. C:\inetpub\LeaversForm\Web)"
+          }
+          $src = Join-Path $env:RUNNER_TEMP "LeaversForm-publish"
+          $webSrc = Join-Path $src "Web"
+          $runnerSrc = Join-Path $src "Runner"
+          if (-not (Test-Path $webSrc)) { throw "Web publish output not found: $webSrc" }
+
+          Write-Host "Syncing Web to $env:IIS_WEB_PATH"
+          robocopy $webSrc $env:IIS_WEB_PATH /MIR /XD logs /XF appsettings.Production.local.json /R:2 /W:2 /NFL /NDL /NJH /NJS
+          if ($LASTEXITCODE -ge 8) { throw "robocopy Web failed with exit code $LASTEXITCODE" }
+
+          if (-not [string]::IsNullOrWhiteSpace($env:IIS_RUNNER_PATH) -and (Test-Path $runnerSrc)) {
+            Write-Host "Syncing Runner to $env:IIS_RUNNER_PATH"
+            robocopy $runnerSrc $env:IIS_RUNNER_PATH /MIR /R:2 /W:2 /NFL /NDL /NJH /NJS
+            if ($LASTEXITCODE -ge 8) { throw "robocopy Runner failed with exit code $LASTEXITCODE" }
+          }
+
+          Import-Module WebAdministration -ErrorAction Stop
+          Restart-WebAppPool -Name "LeaversForm" -ErrorAction SilentlyContinue
+          Write-Host "Deploy complete."

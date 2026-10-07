@@ -1,0 +1,31 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.db
+*.db-shm
+*.db-wal
+
+## Secrets
+appsettings.*.local.json
+secrets.json
+
+.lan-test/
+.live-processing-test/
+.psmodules/
+
+## Logs
+Logs/
+logs/
+*.log
+
+## IDE
+.vs/
+.idea/
+
+## Publish
+publish/
+publish-output/
+build-check*/
+build-check-*/

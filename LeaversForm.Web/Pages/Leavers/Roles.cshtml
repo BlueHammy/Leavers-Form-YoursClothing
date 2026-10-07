@@ -1,0 +1,75 @@
+@page
+@model LeaversForm.Web.Pages.Leavers.RolesModel
+@using LeaversForm.Data.Enums
+@using LeaversForm.Services
+@{ ViewData["Title"] = "User roles"; }
+<div class="toolbar">
+    <h1>User roles</h1>
+    <a class="btn" asp-page="List">Back to requests</a>
+</div>
+<p class="muted">Assign super user or admin access by Microsoft sign-in email. Everyone else is a normal user.</p>
+
+<div class="card form-card">
+    <h2>Assign role</h2>
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <form method="post" asp-page-handler="Assign">
+        <div class="form-field">
+            <label asp-for="Input.Email">Email</label>
+            <input asp-for="Input.Email" placeholder="firstname.lastname@yoursclothing.co.uk" />
+            <span asp-validation-for="Input.Email" class="field-validation-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Input.DisplayName">Display name</label>
+            <input asp-for="Input.DisplayName" placeholder="Full name" />
+            <span asp-validation-for="Input.DisplayName" class="field-validation-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Input.Role">Role</label>
+            <select asp-for="Input.Role">
+                <option value="@AppRole.SuperUser">Super user</option>
+                <option value="@AppRole.Admin">Admin</option>
+            </select>
+        </div>
+        <button class="btn btn-accent" type="submit">Save role</button>
+    </form>
+</div>
+
+<br />
+
+<div class="card table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Users.Any())
+            {
+                <tr><td colspan="4">No elevated users configured.</td></tr>
+            }
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.DisplayName</td>
+                    <td>@user.Email</td>
+                    <td>@LeaversRoles.DescribeRole(user.Role)</td>
+                    <td>
+                        <form method="post" asp-page-handler="Remove" asp-route-id="@user.Id" onsubmit="return confirm('Remove elevated access for @user.DisplayName?');">
+                            <button class="btn btn-danger" type="submit">Remove access</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="muted match-type-help">
+    <strong>Super user</strong> can manage roles, exclusions, and all leaver requests.<br />
+    <strong>Admin</strong> can view, edit, and cancel all leaver requests.<br />
+    <strong>User</strong> can submit requests and only see their own on the request list.
+</p>

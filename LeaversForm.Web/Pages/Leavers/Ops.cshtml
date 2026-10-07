@@ -1,0 +1,128 @@
+@page
+@model LeaversForm.Web.Pages.Leavers.OpsModel
+@{ ViewData["Title"] = "Processing settings"; }
+
+<div class="toolbar">
+    <h1>Processing settings</h1>
+    <a class="btn" asp-page="List">Back to requests</a>
+</div>
+
+@if (Model.Config is null)
+{
+    <div class="card"><p>Could not load settings.</p></div>
+}
+else
+{
+    var config = Model.Config;
+
+    <div class="card">
+        <h2>Processing mode</h2>
+        @if (config.ScriptTestMode)
+        {
+            <p><span class="ops-badge ops-badge-test">Processing: TEST — accounts not disabled</span></p>
+            <p class="muted">New leaver requests will not switch off accounts. Already-running jobs are not stopped automatically — cancel pending requests if needed.</p>
+            @if (config.EmailRedirectActive)
+            {
+                <p class="muted">Note: email redirect is on — mail still goes to @config.EmailRedirectTarget even after you switch to LIVE.</p>
+            }
+            <form method="post" asp-page-handler="SwitchToLive" class="form-card">
+                <div asp-validation-summary="All" class="validation-summary"></div>
+                <div class="form-field">
+                    <label asp-for="LiveConfirmation">Type LIVE to enable real account disables</label>
+                    <input asp-for="LiveConfirmation" autocomplete="off" placeholder="LIVE" />
+                    <span asp-validation-for="LiveConfirmation" class="field-validation-error"></span>
+                </div>
+                <button class="btn btn-danger" type="submit">Switch to LIVE</button>
+            </form>
+        }
+        else
+        {
+            <p><span class="ops-badge ops-badge-live">Processing: LIVE</span></p>
+            <p class="muted">Leaver requests will run when due. Use TEST mode as an emergency stop if something goes wrong.</p>
+            @if (config.EmailRedirectActive)
+            {
+                <p class="warning-box">Email redirect is still on — all mail goes to @config.EmailRedirectTarget. Clear “Redirect all emails to” and save when you are ready for real recipients.</p>
+            }
+            @if (config.EmailRedirectActive)
+            {
+                <p class="warning-box">Email redirect is still on — all mail goes to <strong>@config.EmailRedirectTarget</strong>. Clear “Redirect all emails to” and save when you are ready for real recipients.</p>
+            }
+            <form method="post" asp-page-handler="SwitchToTest" onsubmit="return confirm('Stop all new account disables? Already-running jobs will continue until they finish or you cancel the request.');">
+                <button class="btn btn-accent" type="submit">Switch to TEST (stop disables)</button>
+            </form>
+        }
+    </div>
+
+    <br />
+
+    <div class="card">
+        <h2>Email routing</h2>
+        <p class="muted">Control where notification emails go. Changes take effect immediately and are saved to your local settings file.</p>
+        @if (config.EmailRedirectActive)
+        {
+            <p><span class="ops-badge ops-badge-test">Test redirect active — all mail goes to @config.EmailRedirectTarget</span></p>
+        }
+        else
+        {
+            <p class="muted">Live routing — authorising managers receive their own emails; IT is CC’d on those messages; HR is CC’d when email redirect is off and email test mode is off; errors go to the alert mailbox below.</p>
+        }
+        <form method="post" asp-page-handler="SaveEmailSettings" class="form-card">
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <div class="form-field">
+                <label asp-for="ItCcAddress">IT CC address</label>
+                <input asp-for="ItCcAddress" type="email" autocomplete="off" />
+                <span class="field-help">CC on authorising manager notifications. Use your address while testing; use <code>IT@yoursclothing.co.uk</code> when live.</span>
+            </div>
+            <div class="form-field">
+                <label asp-for="HrCcAddress">HR CC address</label>
+                <input asp-for="HrCcAddress" type="email" autocomplete="off" />
+                <span class="field-help">CC on submission emails when live (redirect off and email test mode off). Use your address while testing; use <code>HR@yoursclothing.co.uk</code> when live.</span>
+            </div>
+            <div class="form-field">
+                <label asp-for="ErrorAlertMailbox">Error alert mailbox</label>
+                <input asp-for="ErrorAlertMailbox" type="email" autocomplete="off" />
+                <span class="field-help">Where failure and system error emails are sent.</span>
+            </div>
+            <div class="form-field">
+                <label asp-for="RedirectAllEmailsTo">Redirect all emails to (optional)</label>
+                <input asp-for="RedirectAllEmailsTo" type="text" inputmode="email" autocomplete="off" placeholder="Leave blank for live routing" />
+                <span class="field-help">While testing, set this to your inbox so every email lands in one place (original recipient shown in the subject). <strong>Clear this before go-live.</strong></span>
+            </div>
+            <button class="btn btn-accent" type="submit">Save email settings</button>
+        </form>
+    </div>
+
+    <br />
+
+    <div class="card">
+        <h2>Maintenance</h2>
+        <p class="muted">Use if a request says Processing for too long, or automation stops working.</p>
+        <form method="post" asp-page-handler="ReconcileAll" style="display:inline" onsubmit="return confirm('Fix stuck requests now?');">
+            <button class="btn" type="submit">Fix stuck requests</button>
+        </form>
+        <form method="post" asp-page-handler="RepairModules" style="display:inline" onsubmit="return confirm('Run automation setup repair now?');">
+            <button class="btn" type="submit">Fix automation setup</button>
+        </form>
+    </div>
+
+    <br />
+
+    <details class="card diagnostics-panel">
+        <summary><strong>Technical details</strong></summary>
+        <ul class="ops-config-list">
+            <li>Processing: @(config.ScriptTestMode ? "TEST" : "LIVE")</li>
+            <li>AD sandbox skip: @(config.ScriptSandboxSkipAd ? "ON" : "off")</li>
+            <li>Email test mode: @(config.EmailTestMode ? "ON" : "off")</li>
+            <li>IT CC: @config.ItCcAddress</li>
+            <li>HR CC: @config.HrCcAddress @(config.EmailRedirectActive || config.EmailTestMode ? "(not CC'd while testing)" : "(CC'd on live submissions)")</li>
+            <li>Error alerts: @config.ErrorAlertMailbox</li>
+            @if (config.EmailRedirectActive)
+            {
+                <li>Email redirect: @config.EmailRedirectTarget</li>
+            }
+            <li>PowerShell script: @(config.ScriptPathExists ? "found" : "missing") — <code>@config.ScriptPath</code></li>
+            <li>Log folder: <code>@config.LogFolderPath</code></li>
+            <li>Automation certificate: @(config.CertificateConfigured ? "configured" : "not configured")</li>
+        </ul>
+    </details>
+}

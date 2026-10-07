@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <title>LeaversForm — IT Operations Guide</title>
+  <style>
+    :root {
+      --green-dark: #0d3b2e;
+      --green-mid: #1a5c45;
+      --green-light: #e8f5ef;
+      --accent: #c9a227;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --warn-bg: #fff7ed;
+      --warn-border: #fb923c;
+      --ok-bg: #ecfdf5;
+      --ok-border: #34d399;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.55;
+      margin: 0;
+      background: #fff;
+      font-size: 11pt;
+    }
+
+    .page {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 18mm 16mm;
+    }
+
+    .cover {
+      min-height: 250mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-bottom: 6px solid var(--green-dark);
+      page-break-after: always;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: var(--green-light);
+      color: var(--green-dark);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 10pt;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 34pt;
+      line-height: 1.1;
+      color: var(--green-dark);
+      margin: 0 0 12px;
+    }
+
+    .subtitle {
+      font-size: 16pt;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .meta {
+      font-size: 10pt;
+      color: var(--muted);
+    }
+
+    h2 {
+      color: var(--green-dark);
+      font-size: 18pt;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--green-light);
+      page-break-after: avoid;
+    }
+
+    h3 {
+      color: var(--green-mid);
+      font-size: 13pt;
+      margin: 20px 0 8px;
+      page-break-after: avoid;
+    }
+
+    p, li { orphans: 3; widows: 3; }
+
+    .lead {
+      font-size: 12pt;
+      color: #374151;
+    }
+
+    .diagram {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0;
+      page-break-inside: avoid;
+    }
+
+    .diagram svg { width: 100%; height: auto; display: block; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #fff;
+      page-break-inside: avoid;
+    }
+
+    .card h4 {
+      margin: 0 0 6px;
+      color: var(--green-dark);
+      font-size: 11pt;
+    }
+
+    .card p, .card ul { margin: 0; font-size: 10pt; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--green-dark);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    code, .path {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5pt;
+      background: #f3f4f6;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--green-mid);
+      background: var(--green-light);
+      padding: 12px 14px;
+      margin: 14px 0;
+      border-radius: 0 8px 8px 0;
+      page-break-inside: avoid;
+    }
+
+    .callout-warn {
+      border-left-color: var(--warn-border);
+      background: var(--warn-bg);
+    }
+
+    .callout-ok {
+      border-left-color: var(--ok-border);
+      background: var(--ok-bg);
+    }
+
+    .toc ol { padding-left: 20px; }
+    .toc li { margin: 6px 0; }
+
+    .folder-tree {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5pt;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 16px;
+      border-radius: 8px;
+      line-height: 1.45;
+      white-space: pre;
+      overflow-x: auto;
+      page-break-inside: avoid;
+    }
+
+    .folder-tree .comment { color: #9ca3af; }
+
+    .status-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 10pt;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+
+    .status-scheduled { background: #dbeafe; color: #1e40af; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-failed { background: #fee2e2; color: #991b1b; }
+    .status-cancelled { background: #e5e7eb; color: #374151; }
+
+    .arrow { color: var(--muted); font-weight: bold; }
+
+    ul.compact { margin: 6px 0; padding-left: 18px; }
+    ul.compact li { margin: 4px 0; }
+
+    .page-break { page-break-before: always; }
+
+    @media print {
+      body { font-size: 10.5pt; }
+      .page { padding: 12mm 14mm; max-width: none; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page cover">
+  <div class="cover-badge">Internal IT Operations Guide</div>
+  <h1>LeaversForm</h1>
+  <div class="subtitle">How the leaver request system works, what each part does, and how to fix it quickly</div>
+  <p class="lead">This guide is written for IT staff who support the application day-to-day. You do not need coding knowledge — think of LeaversForm as a web form plus a scheduled PowerShell offboarding script, connected to Entra ID, Exchange Online, and on-premises Active Directory.</p>
+  <p class="meta">Version: August 2026 (updated) &nbsp;|&nbsp; Organisation: Yours Clothing / SizeUp &nbsp;|&nbsp; Repository: LeaversForm</p>
+</div>
+
+<div class="page">
+
+  <h2>Contents</h2>
+  <div class="toc">
+    <ol>
+      <li>What LeaversForm does</li>
+      <li>Big-picture architecture</li>
+      <li>End-to-end flow: submit to account disable</li>
+      <li>When does the disable script run?</li>
+      <li>Request statuses explained</li>
+      <li>Using the web application (staff &amp; IT)</li>
+      <li>In-app processing settings &amp; diagnostics</li>
+      <li>Two Entra apps (important)</li>
+      <li>Folder and project structure</li>
+      <li>Test mode vs live mode</li>
+      <li>Development vs production</li>
+      <li>Key configuration files</li>
+      <li>Setup scripts cheat sheet</li>
+      <li>Logs and where to look</li>
+      <li>Quick troubleshooting guide</li>
+      <li>Common problems and fixes</li>
+      <li>Safety rules and go-live checklist</li>
+    </ol>
+  </div>
+
+  <h2>1. What LeaversForm does</h2>
+  <p>LeaversForm replaces a manual leaver spreadsheet. Managers and HR submit a leaver through a web form. The system:</p>
+  <ul class="compact">
+    <li>Records who is leaving, when, what equipment they have, and which managers approved it</li>
+    <li>Emails the selected authorising managers</li>
+    <li>At the right time, runs an automated offboarding PowerShell script (<code>LeaverProcess.ps1</code>)</li>
+    <li>Disables the Entra ID account, disables the on-prem AD account, removes group memberships, revokes licences, and cleans up Exchange/mailbox access where possible</li>
+    <li>Shows plain-English status on the request list (Waiting, Processing, Done, Needs IT help)</li>
+    <li>Emails IT if something goes wrong</li>
+  </ul>
+
+  <div class="callout callout-warn">
+    <strong>Golden rule:</strong> Never run the standalone <code>LeaversForm.Runner</code> at the same time as the web app on production. Both would try to process leavers and could cause duplicate runs. The web app already checks every 5 minutes.
+  </div>
+
+  <h2>2. Big-picture architecture</h2>
+  <p>The system has four main layers. The diagram below shows how they connect.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architecture diagram">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <rect x="20" y="20" width="180" height="70" rx="10" fill="#e8f5ef" stroke="#1a5c45" stroke-width="2"/>
+      <text x="110" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#0d3b2e">Staff browser</text>
+      <text x="110" y="68" text-anchor="middle" font-size="11" fill="#374151">Submit / view requests</text>
+
+      <rect x="250" y="20" width="220" height="110" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a">LeaversForm.Web (IIS)</text>
+      <text x="360" y="68" text-anchor="middle" font-size="11" fill="#374151">Razor Pages UI</text>
+      <text x="360" y="86" text-anchor="middle" font-size="11" fill="#374151">Background checker (5 min) + reconcile (30 sec)</text>
+      <text x="360" y="104" text-anchor="middle" font-size="11" fill="#374151">Entra SSO login</text>
+
+      <rect x="530" y="20" width="150" height="70" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="605" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">SQL database</text>
+      <text x="605" y="68" text-anchor="middle" font-size="11" fill="#374151">Requests + audit log</text>
+
+      <rect x="250" y="170" width="220" height="90" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="360" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">LeaversForm.Services</text>
+      <text x="360" y="218" text-anchor="middle" font-size="11" fill="#374151">Business rules, email, script launcher</text>
+      <text x="360" y="236" text-anchor="middle" font-size="11" fill="#374151">Duplicate checks, roles, audit</text>
+
+      <rect x="250" y="300" width="220" height="90" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="360" y="328" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">LeaverProcess.ps1</text>
+      <text x="360" y="348" text-anchor="middle" font-size="11" fill="#374151">PowerShell 7 (pwsh.exe)</text>
+      <text x="360" y="366" text-anchor="middle" font-size="11" fill="#374151">Certificate app-only auth</text>
+
+      <rect x="530" y="170" width="270" height="220" rx="10" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+      <text x="665" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Microsoft 365 + AD</text>
+      <text x="545" y="228" font-size="11" fill="#374151">• Entra ID (disable account, groups, licences)</text>
+      <text x="545" y="250" font-size="11" fill="#374151">• Exchange Online (groups, mailbox perms)</text>
+      <text x="545" y="272" font-size="11" fill="#374151">• Teams / M365 / SharePoint groups (via Graph)</text>
+      <text x="545" y="294" font-size="11" fill="#374151">• On-prem AD (groups, password, disable)</text>
+      <text x="545" y="328" font-size="11" fill="#374151">Requires: VPN/domain join, DC reachable,</text>
+      <text x="545" y="346" font-size="11" fill="#374151">automation cert in cert store, app permissions</text>
+
+      <line x1="200" y1="55" x2="250" y2="55" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="470" y1="75" x2="530" y2="55" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="360" y1="130" x2="360" y2="170" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="360" y1="260" x2="360" y2="300" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="470" y1="345" x2="530" y2="280" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+    </svg>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Web app (LeaversForm.Web)</h4>
+      <p>What users see. Hosted on IIS in production. Includes a background service that polls for due leavers every 5 minutes and reconciles stuck Processing requests every ~30 seconds.</p>
+    </div>
+    <div class="card">
+      <h4>Services layer (LeaversForm.Services)</h4>
+      <p>The “brain”: decides when someone is due, launches PowerShell, sends emails, writes audit entries, handles retries.</p>
+    </div>
+    <div class="card">
+      <h4>Database (LeaversForm.Data)</h4>
+      <p>Stores requests, statuses, audit trail, authorising managers, and security exclusions. SQLite on dev laptops; SQL Server in production.</p>
+    </div>
+    <div class="card">
+      <h4>Offboarding script (LeaverProcess.ps1)</h4>
+      <p>Does the actual account work. Uses a separate Entra app registration with a certificate — not the same as the website login app.</p>
+    </div>
+  </div>
+
+  <h2 class="page-break">3. End-to-end flow: submit to account disable</h2>
+
+  <div class="diagram">
+    <svg viewBox="0 0 820 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Workflow diagram">
+      <defs>
+        <marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 Z" fill="#1a5c45"/>
+        </marker>
+      </defs>
+      <!-- Step boxes -->
+      <g font-family="Segoe UI, Arial, sans-serif">
+        <rect x="30" y="30" width="760" height="52" rx="8" fill="#e8f5ef" stroke="#1a5c45"/>
+        <text x="50" y="52" font-size="12" font-weight="700" fill="#0d3b2e">Step 1</text>
+        <text x="110" y="52" font-size="12" fill="#111827">User submits leaver form (name, leaving date, equipment, managers)</text>
+        <text x="110" y="70" font-size="11" fill="#6b7280">Optional urgent switch-off: admins only (“Switch off their account today”). Duplicate check blocks re-submit unless Cancelled.</text>
+
+        <line x1="410" y1="82" x2="410" y2="105" stroke="#1a5c45" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="30" y="105" width="760" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+        <text x="50" y="127" font-size="12" font-weight="700" fill="#1e3a8a">Step 2</text>
+        <text x="110" y="127" font-size="12" fill="#111827">Request saved as Scheduled. Authorising managers emailed. Audit log entry created.</text>
+        <text x="110" y="145" font-size="11" fill="#6b7280">ScriptEligibleAt = 5:00 PM UK on leaving date — or immediately if admin ticked urgent switch-off</text>
+
+        <line x1="410" y1="157" x2="410" y2="180" stroke="#1a5c45" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="30" y="180" width="760" height="52" rx="8" fill="#fef3c7" stroke="#d97706"/>
+        <text x="50" y="202" font-size="12" font-weight="700" fill="#92400e">Step 3</text>
+        <text x="110" y="202" font-size="12" fill="#111827">Background service checks every 5 minutes (or ASAP queue runs immediately on submit)</text>
+        <text x="110" y="220" font-size="11" fill="#6b7280">When due: status changes to Pending, PowerShell script starts</text>
+
+        <line x1="410" y1="232" x2="410" y2="255" stroke="#1a5c45" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="30" y="255" width="760" height="52" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="50" y="277" font-size="12" font-weight="700" fill="#991b1b">Step 4</text>
+        <text x="110" y="277" font-size="12" fill="#111827">LeaverProcess.ps1 runs: Graph + Exchange (cert auth), AD operations (Windows identity on server)</text>
+        <text x="110" y="295" font-size="11" fill="#6b7280">Writes detailed log to logs folder: offboarding-{requestId}-{timestamp}.log</text>
+
+        <line x1="410" y1="307" x2="410" y2="330" stroke="#1a5c45" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="30" y="330" width="370" height="60" rx="8" fill="#d1fae5" stroke="#059669"/>
+        <text x="50" y="355" font-size="12" font-weight="700" fill="#065f46">Success path</text>
+        <text x="50" y="375" font-size="11" fill="#111827">Entra + AD disabled → Status: Completed</text>
+
+        <rect x="420" y="330" width="370" height="60" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="440" y="355" font-size="12" font-weight="700" fill="#991b1b">Failure path</text>
+        <text x="440" y="375" font-size="11" fill="#111827">Core disable failed → Status: Failed, IT emailed. Super-user can Try again.</text>
+
+        <rect x="30" y="420" width="760" height="70" rx="8" fill="#f3f4f6" stroke="#6b7280"/>
+        <text x="50" y="445" font-size="12" font-weight="700" fill="#111827">If ScriptTestMode = true (safe testing)</text>
+        <text x="50" y="465" font-size="11" fill="#374151">LeaverProcess.ps1 is NOT executed. The request stays Scheduled with an audit note “ScriptTestModeSkipped” so it can run later when live mode is on.</text>
+        <text x="50" y="482" font-size="11" fill="#374151">Admins see a red banner: “Test mode — accounts are not being disabled.” Use Admin → Processing settings to flip LIVE/TEST without restarting the app.</text>
+      </g>
+    </svg>
+  </div>
+
+  <h2>4. When does the disable script run?</h2>
+  <table>
+    <thead>
+      <tr><th>Scenario</th><th>When script runs</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Normal submit</strong><br/>No urgent switch-off</td>
+        <td><strong>5:00 PM UK time</strong> on the leaving date (within ~5 minutes after, when the background checker runs)</td>
+        <td>Uses UK timezone with automatic GMT/BST handling. The web app must be running at that time.</td>
+      </tr>
+      <tr>
+        <td><strong>Urgent switch-off</strong><br/>(admin/super-user only on submit form)</td>
+        <td><strong>Immediately</strong> after form submit (background task, usually seconds)</td>
+        <td>Checkbox: “Switch off their account today (IT admins only)”. Regular users cannot enable this.</td>
+      </tr>
+      <tr>
+        <td><strong>Edited leaving date</strong></td>
+        <td>Recalculated to 5 PM on the new date (unless urgent switch-off was used)</td>
+        <td>Only editable while status is Waiting/Scheduled (admin rules apply).</td>
+      </tr>
+      <tr>
+        <td><strong>Failed request — Try again</strong></td>
+        <td>Immediately when a super-user clicks Try again</td>
+        <td>Only Failed requests. Resets to Pending and re-runs script.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Important:</strong> This is not a Windows Scheduled Task running once at 5 PM. The web application wakes up every <strong>5 minutes</strong>, looks for any requests whose scheduled time has passed, and processes them. That is why IIS must keep the app pool running (Always On, idle timeout 0).
+  </div>
+
+  <h2>5. Request statuses explained</h2>
+  <p>Staff see <strong>plain-English labels</strong> in the app. IT still uses the internal names in logs, export, and the database.</p>
+
+  <table>
+    <thead><tr><th>What users see</th><th>Internal status</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Waiting</strong></td><td>Scheduled</td><td>Waiting for 5 PM on leaving date (or about to run)</td></tr>
+      <tr><td><strong>Processing</strong></td><td>Pending</td><td>Script is running or was interrupted</td></tr>
+      <tr><td><strong>Done</strong></td><td>Completed</td><td>Offboarding finished (Entra + AD disabled at minimum)</td></tr>
+      <tr><td><strong>Needs IT help</strong></td><td>Failed</td><td>Script failed — IT notified; super-user can Try again</td></tr>
+      <tr><td><strong>Cancelled</strong></td><td>Cancelled</td><td>Request withdrawn — hidden from normal list views</td></tr>
+    </tbody>
+  </table>
+
+  <div class="status-flow">
+    <span class="status status-scheduled">Waiting</span>
+    <span class="arrow">→</span>
+    <span class="status status-pending">Processing</span>
+    <span class="arrow">→</span>
+    <span class="status status-completed">Done</span>
+  </div>
+  <div class="status-flow">
+    <span class="status status-pending">Processing</span>
+    <span class="arrow">→</span>
+    <span class="status status-failed">Needs IT help</span>
+    <span class="arrow">→ Try again →</span>
+    <span class="status status-pending">Processing</span>
+  </div>
+
+  <table>
+    <thead><tr><th>Internal status</th><th>Can edit leaving date?</th><th>Can cancel?</th></tr></thead>
+    <tbody>
+      <tr><td>Scheduled (Waiting)</td><td>Yes (admins)</td><td>Yes (admins)</td></tr>
+      <tr><td>Pending (Processing)</td><td>No</td><td>Yes (admins — attempts to stop script)</td></tr>
+      <tr><td>Completed (Done)</td><td>No</td><td>No</td></tr>
+      <tr><td>Failed (Needs IT help)</td><td>No</td><td>Yes (admins)</td></tr>
+      <tr><td>Cancelled</td><td>No</td><td>No</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="page-break">6. Using the web application (staff &amp; IT)</h2>
+  <p>The app opens on the <strong>Leaver requests</strong> list (not the submit form). This is intentional — most visits are to check status.</p>
+
+  <table>
+    <thead><tr><th>Page / area</th><th>Who</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Requests</strong> (list)</td>
+        <td>Everyone with access</td>
+        <td>See leavers you submitted or authorise. Columns: name, leaving date, status (+ subtitle with timing). Urgent requests show an <strong>Urgent</strong> badge. Admins can <strong>Show more columns</strong> for equipment and submitted-by.</td>
+      </tr>
+      <tr>
+        <td><strong>Submit</strong></td>
+        <td>All signed-in users</td>
+        <td>Search colleague by name/email, pick leaving date, tick equipment, choose authorising managers (they get an email), submit. Admins/super-users may tick <strong>Switch off their account today (IT admins only)</strong> for immediate processing.</td>
+      </tr>
+      <tr>
+        <td><strong>Request details</strong></td>
+        <td>Submitter, authorising managers, admins</td>
+        <td>Full info, plain status, equipment notes. Admins see sign-in name (UPN); everyone sees work email.</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong> menu (nav)</td>
+        <td>Super-user only</td>
+        <td>Dropdown: <strong>Processing settings</strong>, <strong>Blocked accounts</strong>, <strong>User roles</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>Export Excel</strong></td>
+        <td>Admin / super-user</td>
+        <td>On the requests list toolbar — secondary button.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Banners users see:</strong>
+    <ul class="compact">
+      <li><strong>Regular staff:</strong> no test-mode or technical banners (only success messages after actions).</li>
+      <li><strong>Admins:</strong> one red banner when test mode is on, with a link to Processing settings.</li>
+      <li><strong>Super-users:</strong> email/sandbox/script-path details live under Processing settings → Technical details (collapsed).</li>
+    </ul>
+  </div>
+
+  <h2>7. In-app processing settings &amp; diagnostics (super-user)</h2>
+  <p>Most day-to-day IT work no longer requires RDP, log folders, or PowerShell CLIs. Super-users use the web UI at <strong>Admin → Processing settings</strong> (<code>/Leavers/Ops</code>).</p>
+
+  <table>
+    <thead><tr><th>Feature</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Email routing</strong></td>
+        <td>Edit <strong>IT CC address</strong>, <strong>Error alert mailbox</strong>, and optional <strong>Redirect all emails to</strong>. Saved immediately to local settings — no restart. While testing, set redirect to your inbox; for go-live, clear redirect and set IT CC / errors to <code>IT@yoursclothing.co.uk</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>LIVE / TEST toggle</strong></td>
+        <td>Emergency stop or go-live without restarting the app. Takes effect immediately and persists <code>ScriptTestMode</code> to the local settings file (<code>appsettings.*.local.json</code>). Switching to LIVE requires typing <code>LIVE</code>. Audit entry: <code>ProcessingModeChanged</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Fix stuck requests</strong></td>
+        <td>Runs reconciliation for all stuck Pending/Scheduled requests (same as automatic 30-second background reconciliation, but on demand).</td>
+      </tr>
+      <tr>
+        <td><strong>Fix automation setup</strong></td>
+        <td>Repairs PowerShell module environment (<code>Repair-LeaversFormModules.ps1</code> pattern).</td>
+      </tr>
+      <tr>
+        <td><strong>Technical details</strong> (collapsed)</td>
+        <td>Script path, log folder, cert configured, email test mode, AD sandbox skip — for troubleshooting only.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Per-request diagnostics (super-user, on Details page)</h3>
+  <p>Expand <strong>Diagnostics (super user)</strong> on any request:</p>
+  <ul class="compact">
+    <li><strong>Audit timeline</strong> — every action (Created, ScriptStarted, ScriptCompleted/Failed, Cancel, ProcessingModeChanged, etc.)</li>
+    <li><strong>Platform status</strong> — Graph / Exchange / AD summary from the latest offboarding log</li>
+    <li><strong>Download logs</strong> — offboarding and summary execution logs (path-validated)</li>
+    <li><strong>Fix stuck request</strong> — reconcile one request when status is Processing or stale Waiting</li>
+    <li><strong>Script process active</strong> — yes/no while Processing</li>
+  </ul>
+
+  <div class="callout callout-warn">
+    <strong>Cancel while Processing:</strong> Admins can cancel a Pending request. The app attempts to terminate the in-flight PowerShell process. Always verify account state in Entra/AD after cancelling — termination is best-effort.
+  </div>
+
+  <div class="callout callout-ok">
+    <strong>Automatic reconciliation:</strong> Every ~30 seconds the web app reconciles stuck Pending requests (reads offboarding logs, terminates hung processes, marks Failed or Completed). The in-app “Fix stuck” buttons trigger the same logic immediately.
+  </div>
+
+  <h2 class="page-break">8. Two Entra apps (important)</h2>
+  <p>LeaversForm uses <strong>two separate Entra ID app registrations</strong>. Mixing them up is the most common certificate/permission problem.</p>
+
+  <table>
+    <thead>
+      <tr><th></th><th>Web SSO app</th><th>PowerShell automation app</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Purpose</strong></td>
+        <td>Users sign into the website</td>
+        <td>LeaverProcess.ps1 connects to Graph &amp; Exchange</td>
+      </tr>
+      <tr>
+        <td><strong>Auth method</strong></td>
+        <td>Client secret (in app settings)</td>
+        <td>Certificate (private key in cert store; public .cer uploaded to Entra)</td>
+      </tr>
+      <tr>
+        <td><strong>Config keys</strong></td>
+        <td><code>AzureAd:ClientId</code>, <code>ClientSecret</code></td>
+        <td><code>LeaversForm:PowerShellAppId</code>, <code>PowerShellCertificateThumbprint</code></td>
+      </tr>
+      <tr>
+        <td><strong>Typical mistake</strong></td>
+        <td>—</td>
+        <td>Uploading the .cer to the wrong app, or using the .cer file locally (it has no private key — you need the .pfx in the cert store)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="diagram">
+    <svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="30" width="240" height="140" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      <text x="140" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a">Web SSO App</text>
+      <text x="140" y="85" text-anchor="middle" font-size="11" fill="#374151">Staff login to LeaversForm</text>
+      <text x="140" y="105" text-anchor="middle" font-size="11" fill="#374151">Client secret</text>
+      <text x="140" y="125" text-anchor="middle" font-size="11" fill="#374151">Graph: send emails, user search</text>
+
+      <rect x="560" y="30" width="240" height="140" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="680" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">Automation App</text>
+      <text x="680" y="85" text-anchor="middle" font-size="11" fill="#374151">LeaverProcess.ps1 only</text>
+      <text x="680" y="105" text-anchor="middle" font-size="11" fill="#374151">Certificate auth</text>
+      <text x="680" y="125" text-anchor="middle" font-size="11" fill="#374151">Graph + Exchange app permissions</text>
+
+      <text x="410" y="110" text-anchor="middle" font-size="28" fill="#6b7280">≠</text>
+      <text x="410" y="140" text-anchor="middle" font-size="11" fill="#6b7280">These are NOT interchangeable</text>
+    </svg>
+  </div>
+
+  <h2>9. Folder and project structure</h2>
+  <div class="folder-tree">LeaversForm/
+├── <span class="comment">── Web application (what users open in browser)</span>
+├── LeaversForm.Web/          Pages, layout, IIS-hosted background checker
+├── LeaversForm.Services/     Business logic, PowerShell launcher, Graph email
+├── LeaversForm.Data/         Database models, migrations, seed data
+├── LeaversForm.Runner/       Optional fallback batch job (do NOT run with Web in prod)
+├── LeaversForm.Tests/        Automated unit tests
+│
+├── <span class="comment">── Offboarding script</span>
+├── LeaverProcess.ps1         Master copy of the disable script
+├── scripts/                  Dev/runtime copy (auto-synced by the app)
+├── logs/                     Offboarding logs (dev); production uses publish folder\logs
+│
+├── <span class="comment">── Deployment &amp; operations</span>
+├── deploy/                   IIS setup, publish, firewall, cert ACL, readiness tests
+├── docs/                     This guide + deployment notes
+├── Final-Build.ps1           One-click production server setup (run as admin)
+│
+├── <span class="comment">── Dev / testing helpers (laptop)</span>
+├── Start-LanTest.ps1         Run the site locally over HTTPS on your LAN
+├── Set-TestProcessing.ps1    Turn test mode ON (ScriptTestMode true)
+├── Set-LiveProcessing.ps1    Turn live script mode ON (dev only — careful!)
+├── Initialize-LiveProcessingTest.ps1   First-time laptop setup for real script testing
+├── Repair-LiveProcessingCertificate.ps1  Fix cert/thumbprint issues
+└── Test-LiveProcessingReadiness.ps1      Preflight checks before going live</div>
+
+  <h3>What each project does (simple view)</h3>
+  <table>
+    <thead><tr><th>Project / folder</th><th>Think of it as…</th></tr></thead>
+    <tbody>
+      <tr><td><code>LeaversForm.Web</code></td><td>The website + the 5-minute background timer</td></tr>
+      <tr><td><code>LeaversForm.Services</code></td><td>Rules engine: who can submit, when to run script, send alerts</td></tr>
+      <tr><td><code>LeaversForm.Data</code></td><td>The database schema and startup seed data (managers list, etc.)</td></tr>
+      <tr><td><code>LeaversForm.Runner</code></td><td>Standalone “run once and exit” processor — emergency fallback only</td></tr>
+      <tr><td><code>deploy/</code></td><td>Scripts used when installing on the real server</td></tr>
+      <tr><td><code>LeaverProcess.ps1</code></td><td>The actual account disable / cleanup automation</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="page-break">10. Test mode vs live mode</h2>
+  <p>Three safety switches control how “real” the system behaves. The most important is <code>ScriptTestMode</code>.</p>
+
+  <div class="callout callout-warn">
+    <strong>Preferred ways to flip test/live (no app restart required):</strong>
+    <ul class="compact">
+      <li><strong>Super-user:</strong> Admin → <strong>Processing settings</strong> → Switch to TEST or LIVE (LIVE requires typing <code>LIVE</code>).</li>
+      <li>Effect is <strong>immediate</strong> for the running web app. The setting is also saved to <code>appsettings.Development.local.json</code> or <code>appsettings.Production.local.json</code>.</li>
+    </ul>
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>PowerShell / config file (still supported):</strong>
+    <ol class="compact">
+      <li><code>.\Set-TestProcessing.ps1</code> or <code>.\Set-LiveProcessing.ps1</code> / <code>.\Enable-LiveProcessing.ps1</code></li>
+      <li><strong>Restart</strong> the web app if you only changed the file outside the UI (IIS recycle or stop/start <code>Start-LanTest.ps1</code>).</li>
+    </ol>
+    <p style="margin:8px 0 0">On startup, confirm logs or Processing settings show the expected mode. Admins see a red banner when test mode is on.</p>
+  </div>
+
+  <div class="callout">
+    <strong>How to tell test mode ran instead of the real script:</strong>
+    <ul class="compact">
+      <li>Audit log contains <code>ScriptTestModeSkipped</code></li>
+      <li>Request stays <strong>Waiting</strong> (Scheduled) — not Done</li>
+      <li>No file <code>logs\offboarding-{requestId}-*.log</code> with real disable steps</li>
+    </ul>
+    <p style="margin:8px 0 0">Fix: switch to LIVE in Processing settings (or run live scripts), then submit again with urgent switch-off if testing immediately.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Setting</th><th>Test (safe)</th><th>Live (production)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>LeaversForm:ScriptTestMode</code></td>
+        <td><strong>true</strong> — script does NOT run, accounts NOT disabled</td>
+        <td><strong>false</strong> — LeaverProcess.ps1 runs for real</td>
+      </tr>
+      <tr>
+        <td><code>Graph:EmailTestMode</code></td>
+        <td><strong>true</strong> — emails logged, not sent</td>
+        <td><strong>false</strong> — real emails via Microsoft Graph</td>
+      </tr>
+      <tr>
+        <td><code>Graph:RedirectAllEmailsTo</code></td>
+        <td>Set to a tester mailbox (semi-live / dev) — all mail redirected there</td>
+        <td>Empty — mail goes to real recipients</td>
+      </tr>
+      <tr>
+        <td><code>LeaversForm:ScriptSandboxSkipAd</code></td>
+        <td><strong>true</strong> — AD disable skipped (Entra still runs); dev/sandbox only</td>
+        <td><strong>false</strong> — full AD disable</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-ok">
+    <strong>Typical dev laptop:</strong> Use Processing settings or <code>Set-TestProcessing.ps1</code> when colleagues test the form. Use live mode only when you intend to disable real accounts.
+  </div>
+
+  <h2>11. Development vs production</h2>
+  <table>
+    <thead><tr><th>Topic</th><th>Development (laptop)</th><th>Production (server)</th></tr></thead>
+    <tbody>
+      <tr><td>How it runs</td><td><code>Start-LanTest.ps1</code> or <code>dotnet run</code></td><td>IIS website + Always Running app pool</td></tr>
+      <tr><td>Database</td><td>SQLite file <code>leaversform.db</code></td><td>SQL Server</td></tr>
+      <tr><td>Certificate store</td><td>CurrentUser\My (laptop testing)</td><td>LocalMachine\My + IIS app pool ACL</td></tr>
+      <tr><td>Script / logs path</td><td><code>scripts/</code> and <code>logs/</code> in repo folder</td><td>Inside IIS publish folder (e.g. <code>C:\inetpub\LeaversForm\Web\logs</code>)</td></tr>
+      <tr><td>Setup script</td><td>Initialize-LiveProcessingTest.ps1</td><td>Final-Build.ps1 -EnableLiveMode</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12. Key configuration files</h2>
+  <table>
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>appsettings.json</code></td><td>Base defaults — test modes ON, safe for fresh install</td></tr>
+      <tr><td><code>appsettings.Development.local.json</code></td><td><strong>Gitignored secrets</strong> — Entra IDs, cert thumbprint, ScriptTestMode (dev laptop)</td></tr>
+      <tr><td><code>appsettings.Production.local.json</code></td><td><strong>Gitignored secrets</strong> on server — SQL connection, client secret, live flags</td></tr>
+      <tr><td><code>appsettings.LanTest.local.json</code></td><td>Written by Start-LanTest.ps1 — LAN HTTPS URL and cert path</td></tr>
+    </tbody>
+  </table>
+
+  <h2>13. Setup scripts cheat sheet</h2>
+  <table>
+    <thead><tr><th>Script</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td><code>Start-LanTest.ps1</code></td><td>Run the site locally for demos/testing on your LAN</td></tr>
+      <tr><td><code>Initialize-LiveProcessingTest.ps1</code></td><td>First-time laptop setup: create cert, export .cer for Entra, configure script paths</td></tr>
+      <tr><td><code>Repair-LiveProcessingCertificate.ps1</code></td><td>“Certificate not found” or wrong thumbprint — imports .pfx and fixes config</td></tr>
+      <tr><td><code>Test-LiveProcessingReadiness.ps1</code></td><td>Run before going live — checks modules, cert, script path, test mode flag</td></tr>
+      <tr><td><code>Enable-LiveProcessing.ps1</code></td><td>Quick: ScriptTestMode false + readiness check (then restart app)</td></tr>
+      <tr><td><code>Set-TestProcessing.ps1</code></td><td>Quick: ScriptTestMode true in local JSON (restart app if not using UI toggle)</td></tr>
+      <tr><td><code>Set-LiveProcessing.ps1</code></td><td>Full live setup wizard (cert, paths, ScriptTestMode false)</td></tr>
+      <tr><td><code>scripts\reset-leaver-requests.ps1</code></td><td>Remove test/false requests: <code>-List</code>, <code>-Name Bachu</code>, <code>-Id 18</code>, <code>-All</code></td></tr>
+      <tr><td><code>Final-Build.ps1 -EnableLiveMode</code></td><td>Production server: publish, cert, IIS, modules, checklist</td></tr>
+      <tr><td><code>Repair-LeaversFormModules.ps1</code></td><td>Same as in-app “Fix automation setup” — verify/repair Graph + Exchange modules</td></tr>
+      <tr><td><code>LeaversForm.Runner --reconcile</code></td><td>CLI fallback to fix stuck requests (prefer Admin → Processing settings)</td></tr>
+      <tr><td><code>deploy\Test-ProductionReadiness.ps1</code></td><td>Post-install checks on the server</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="page-break">14. Logs and where to look</h2>
+  <table>
+    <thead><tr><th>Log</th><th>Location</th><th>Contains</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Offboarding log</strong> (most useful)</td>
+        <td><code>logs\offboarding-{requestId}-*.log</code></td>
+        <td>Step-by-step script output: Graph connect, AD disable, group removals, errors</td>
+      </tr>
+      <tr>
+        <td>App execution summary</td>
+        <td><code>logs\{requestId}_{timestamp}.log</code></td>
+        <td>Exit code + link to offboarding log excerpt</td>
+      </tr>
+      <tr>
+        <td>IIS / application</td>
+        <td>Windows Event Viewer → Application; IIS stdout logs if enabled</td>
+        <td>Web app crashes, startup errors, ScriptTestMode banner</td>
+      </tr>
+      <tr>
+        <td>Audit trail (in app)</td>
+        <td>Request Details → Diagnostics (super-user) — or cancel/export audit in DB</td>
+        <td>Created, ScriptStarted, ScriptCompleted/Failed, ScriptTestModeSkipped, ProcessingModeChanged, Cancel, Try again</td>
+      </tr>
+      <tr>
+        <td>In-app log download</td>
+        <td>Details → Diagnostics → Download offboarding / summary log</td>
+        <td>Same files as on disk; super-user only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Tip:</strong> When IT gets a failure email, open the latest <code>offboarding-{id}-*.log</code> first. Search for <code>[ERROR]</code> or <code>Failed:</code>. The Entra + AD disable lines are the most important for confirming core success.
+  </div>
+
+  <h2>15. Quick troubleshooting guide</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 820 480" xmlns="http://www.w3.org/2000/svg">
+      <text x="410" y="25" text-anchor="middle" font-size="14" font-weight="700" fill="#0d3b2e">Start here when something breaks</text>
+
+      <rect x="300" y="40" width="220" height="44" rx="8" fill="#fef3c7" stroke="#d97706"/>
+      <text x="410" y="67" text-anchor="middle" font-size="11" fill="#111827">What is the symptom?</text>
+
+      <rect x="40" y="120" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="140" y="145" text-anchor="middle" font-size="11" font-weight="700">Account not disabled</text>
+      <text x="140" y="163" text-anchor="middle" font-size="10">Check ScriptTestMode,</text>
+      <text x="140" y="176" text-anchor="middle" font-size="10">app running at 5 PM, logs</text>
+
+      <rect x="310" y="120" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="410" y="145" text-anchor="middle" font-size="11" font-weight="700">Status stuck Pending</text>
+      <text x="410" y="163" text-anchor="middle" font-size="10">Check if script still running;</text>
+      <text x="410" y="176" text-anchor="middle" font-size="10">read offboarding log end</text>
+
+      <rect x="580" y="120" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="680" y="145" text-anchor="middle" font-size="11" font-weight="700">Certificate error</text>
+      <text x="680" y="163" text-anchor="middle" font-size="10">Run Repair-LiveProcessing</text>
+      <text x="680" y="176" text-anchor="middle" font-size="10">Certificate.ps1</text>
+
+      <rect x="40" y="220" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="140" y="245" text-anchor="middle" font-size="11" font-weight="700">Exchange failures</text>
+      <text x="140" y="263" text-anchor="middle" font-size="10">Reinstall ExchangeOnline</text>
+      <text x="140" y="276" text-anchor="middle" font-size="10">Management module</text>
+
+      <rect x="310" y="220" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="410" y="245" text-anchor="middle" font-size="11" font-weight="700">AD / DC unreachable</text>
+      <text x="410" y="263" text-anchor="middle" font-size="10">VPN, domain join,</text>
+      <text x="410" y="276" text-anchor="middle" font-size="10">PowerShellDomainController</text>
+
+      <rect x="580" y="220" width="200" height="56" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="680" y="245" text-anchor="middle" font-size="11" font-weight="700">Duplicate submit blocked</text>
+      <text x="680" y="263" text-anchor="middle" font-size="10">Expected — check request</text>
+      <text x="680" y="276" text-anchor="middle" font-size="10">list for existing entry</text>
+
+      <rect x="170" y="320" width="480" height="130" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+      <text x="410" y="348" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">First 5-minute fix checklist</text>
+      <text x="190" y="372" font-size="11" fill="#111827">1. Is test mode on? (admin banner or Processing settings)</text>
+      <text x="190" y="392" font-size="11" fill="#111827">2. Is the IIS app pool running? (production — must be Always Running)</text>
+      <text x="190" y="412" font-size="11" fill="#111827">3. Open Details → Diagnostics or latest offboarding log — what failed?</text>
+      <text x="190" y="432" font-size="11" fill="#111827">4. Try “Fix stuck requests” on Processing settings, or Test-LiveProcessingReadiness.ps1</text>
+    </svg>
+  </div>
+
+  <h2>16. Common problems and fixes</h2>
+
+  <h3>Problem: Graph "assembly already loaded" / Get-MgUser fails</h3>
+  <ul class="compact">
+    <li><strong>Automatic:</strong> Each run of <code>LeaverProcess.ps1</code> now aligns Graph module versions, repairs if needed, and restarts in a fresh PowerShell session if required. You should not need manual <code>Uninstall-Module</code> steps.</li>
+    <li><strong>Manual (optional):</strong> Run <code>.\Repair-LeaversFormModules.ps1</code> once if you want to verify modules outside a leaver run.</li>
+    <li>Ensure <code>LeaversForm-ModuleBootstrap.ps1</code> sits beside <code>LeaverProcess.ps1</code> in the scripts folder (synced automatically on app startup).</li>
+  </ul>
+
+  <h3>Problem: Status Completed but account not disabled (empty offboarding log)</h3>
+  <ul class="compact">
+    <li><strong>Cause (current builds):</strong> Unlikely if status shows Done — check audit for <code>ScriptTestModeSkipped</code> (request would still be Waiting).</li>
+    <li>If status is Done but account live: read offboarding log — Entra/AD lines must show disabled.</li>
+    <li>Confirm Processing settings shows LIVE, or run <code>.\Enable-LiveProcessing.ps1</code>.</li>
+    <li>Super-user: Try again on Failed, or cancel and re-submit with urgent switch-off for a controlled retest.</li>
+  </ul>
+
+  <h3>Problem: Someone submitted a leaver but nothing happened at 5 PM</h3>
+  <ul class="compact">
+    <li>Check <code>ScriptTestMode</code> — if true, nothing will disable (by design).</li>
+    <li>Confirm the web app / IIS site was running at 5 PM. If the app pool was stopped, processing resumes when it restarts.</li>
+    <li>Open the request on the list — is status still <strong>Scheduled</strong>? Check leaving date is correct.</li>
+    <li>Look in <code>logs\</code> for any new files after 5 PM.</li>
+  </ul>
+
+  <h3>Problem: Request stuck on Processing</h3>
+  <ul class="compact">
+    <li>Check latest <code>offboarding-{id}-*.log</code> — does it end with “Finished offboarding”?</li>
+    <li>Wait up to ~30 seconds — automatic reconciliation runs in the background.</li>
+    <li>Super-user: Details → <strong>Fix stuck request</strong>, or Processing settings → <strong>Fix stuck requests</strong>.</li>
+    <li>If genuinely stuck &gt; 45 minutes with no log progress, status may move to Needs IT help — Try again.</li>
+    <li>CLI fallback: <code>LeaversForm.Runner --reconcile</code></li>
+  </ul>
+
+  <h3>Problem: Certificate / “private key not found”</h3>
+  <ul class="compact">
+    <li>The <code>.cer</code> file is for Entra upload only — it cannot run the script locally.</li>
+    <li>Run <code>.\Repair-LiveProcessingCertificate.ps1</code> to import the <code>.pfx</code> from <code>.live-processing-test\</code>.</li>
+    <li>On production: confirm cert is in LocalMachine\My and IIS app pool has read access (<code>deploy\Grant-LeaversFormCertificateAccess.ps1</code>).</li>
+    <li>Verify thumbprint in config matches: <code>Get-ChildItem Cert:\LocalMachine\My</code> (or CurrentUser\My on laptop).</li>
+  </ul>
+
+  <h3>Problem: Graph connects but Exchange fails</h3>
+  <ul class="compact">
+    <li>Common on dev laptops: “Module could not be correctly formed” — reinstall ExchangeOnlineManagement module.</li>
+    <li>Entra + AD disable can still succeed; Exchange cleanup (DLs, shared mailboxes) needs EXO working.</li>
+    <li>Confirm automation app has Exchange Online application permissions + admin consent.</li>
+  </ul>
+
+  <h3>Problem: AD user not found / DC unreachable</h3>
+  <ul class="compact">
+    <li>Server or laptop must reach the domain controller — VPN if off-site.</li>
+    <li>Check <code>LeaversForm:PowerShellDomainController</code> (e.g. <code>SH-DC-01.sizeup.local</code>).</li>
+    <li>On production, IIS app pool should run as a domain service account with AD delegate permissions — not ApplicationPoolIdentity.</li>
+  </ul>
+
+  <h3>Problem: “User already submitted” when creating request</h3>
+  <ul class="compact">
+    <li>Expected behaviour — prevents duplicate leaver entries for the same person.</li>
+    <li>Check the request list for an existing Scheduled, Pending, Failed, or Completed entry.</li>
+    <li>Only <strong>Cancelled</strong> requests allow the same person to be submitted again.</li>
+  </ul>
+
+  <h3>Problem: IT failure email received</h3>
+  <ul class="compact">
+    <li>Super-user: open request Details → expand Diagnostics (audit + platform status + download logs).</li>
+    <li>Read <code>offboarding-{id}-*.log</code> for the real error (email includes a platform summary).</li>
+    <li>Fix root cause, then super-user clicks <strong>Try again</strong> on Failed requests.</li>
+  </ul>
+
+  <h2 class="page-break">17. Safety rules and go-live checklist</h2>
+
+  <div class="callout callout-warn">
+    <strong>Before letting anyone use the form in production:</strong>
+    <ul class="compact">
+      <li><code>ScriptTestMode</code> must be <strong>false</strong></li>
+      <li>Automation certificate uploaded to the <strong>PowerShell app</strong> (not web app) in Entra</li>
+      <li>Graph + Exchange application permissions granted with admin consent</li>
+      <li>IIS app pool: Always Running, idle timeout 0, preload enabled</li>
+      <li>Domain service account with cert private key access + AD permissions</li>
+      <li>Run one controlled urgent switch-off test against a test account first (admin submits with “Switch off their account today”)</li>
+      <li>Confirm Processing settings shows LIVE and no admin test banner</li>
+      <li>Super-users configured on User roles page (or verify seed accounts)</li>
+    </ul>
+  </div>
+
+  <h3>Roles in the application</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Can do</th></tr></thead>
+    <tbody>
+      <tr><td>User</td><td>Submit leavers; view own requests and requests where they are an authorising manager (read-only)</td></tr>
+      <tr><td>Admin</td><td>View all requests; edit Waiting requests; cancel Waiting/Processing/Failed; export Excel; tick urgent switch-off on submit</td></tr>
+      <tr><td>Super-user</td><td>Everything admin can do + Try again on Failed + Processing settings (LIVE/TEST, fix stuck, repair modules) + Blocked accounts + User roles + per-request Diagnostics</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Security exclusions (“Blocked accounts”)</h3>
+  <p>Super-users maintain rules that prevent certain accounts from being submitted (e.g. ADM_ prefix, named executives, CST in name). Matches are enforced at user search and submit time.</p>
+
+  <h3>What LeaverProcess.ps1 removes (summary)</h3>
+  <ul class="compact">
+    <li>Entra: group memberships (Teams, M365, SharePoint-backed, security, mail-enabled), admin roles, app role assignments, licences, sign-in sessions, account disabled</li>
+    <li>Exchange (when connected): distribution groups, mailbox forwarding, Full Access / Send As / Send on Behalf, auto-replies</li>
+    <li>On-prem AD: group memberships, dial-in setting, password reset, account disabled</li>
+  </ul>
+
+  <div class="callout callout-ok">
+    <strong>Rollback to safe mode:</strong> Admin → Processing settings → Switch to TEST, or run <code>.\Set-TestProcessing.ps1</code>. No accounts will be disabled until switched back to LIVE.
+  </div>
+
+  <hr style="margin-top: 40px; border: none; border-top: 1px solid var(--border);" />
+  <p class="meta" style="text-align: center;">LeaversForm IT Operations Guide — August 2026<br/>See also: <code>docs/PRODUCTION-DEPLOYMENT.md</code>, <code>docs/SEMI-LIVE-TESTING.md</code>, <code>README.md</code><br/>For questions about this system, contact the LeaversForm project owner / internal IT development team.</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+@page
+@model LeaversForm.Web.Pages.Leavers.ListModel
+@using LeaversForm.Data.Enums
+@using LeaversForm.Services
+@{ ViewData["Title"] = "Leaver requests"; }
+
+<div class="toolbar">
+    <h1>Leaver requests</h1>
+    <div>
+        <a class="btn btn-accent" asp-page="Create">Submit a leaver</a>
+        @if (Model.CanManageRequests)
+        {
+            <a class="btn btn-secondary" asp-page="Export">Export Excel</a>
+        }
+    </div>
+</div>
+
+<form method="get">
+    @if (Model.ShowExpanded)
+    {
+        <input type="hidden" name="expanded" value="true" />
+    }
+    <input name="search" value="@Model.Search" placeholder="Search by name or department" />
+</form>
+
+@if (Model.CanManageRequests)
+{
+    <p class="list-expand-toggle">
+        @if (Model.ShowExpanded)
+        {
+            <a asp-page="List" asp-route-search="@Model.Search">Show fewer columns</a>
+        }
+        else
+        {
+            <a asp-page="List" asp-route-search="@Model.Search" asp-route-expanded="true">Show more columns</a>
+        }
+    </p>
+}
+
+<p id="leaver-list-live-indicator" class="live-indicator" hidden aria-live="polite">Updating statuses…</p>
+
+<br />
+
+<div class="card table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Leaver</th>
+                <th>Leaving date</th>
+                @if (Model.ShowExpanded)
+                {
+                    <th>Equipment</th>
+                    <th>Submitted by</th>
+                }
+                <th>Status</th>
+                @if (Model.CanManageRequests)
+                {
+                    <th></th>
+                }
+            </tr>
+        </thead>
+        <tbody id="leaver-requests-body" data-search="@Model.Search" data-highlight-id="@Model.HighlightRequestId">
+            @if (!Model.Requests.Any())
+            {
+                <tr>
+                    <td colspan="@(Model.ShowExpanded ? (Model.CanManageRequests ? 6 : 5) : (Model.CanManageRequests ? 4 : 3))">
+                        @if (Model.CanManageRequests)
+                        {
+                            <span>No requests yet.</span>
+                            <a class="btn btn-accent" asp-page="Create">Submit first leaver</a>
+                        }
+                        else
+                        {
+                            <span>You have not submitted any leaver requests yet, and none list you as an authorising manager.</span>
+                        }
+                    </td>
+                </tr>
+            }
+            @foreach (var item in Model.Requests)
+            {
+                var isCancelled = item.Status == LeaverStatus.Cancelled;
+                var statusDetail = Model.StatusDetails.GetValueOrDefault(item.Id);
+                var detailClass = item.Status switch
+                {
+                    LeaverStatus.Failed => "failed-note",
+                    LeaverStatus.Pending => "pending-note",
+                    _ => "status-subtle"
+                };
+                var isHighlighted = Model.HighlightRequestId == item.Id;
+                var statusLabel = LeaverStatusDisplay.ToLabel(item.Status);
+
+                <tr class="status-@item.Status.ToString().ToLowerInvariant()@(isHighlighted ? " row-highlight" : "")" data-request-id="@item.Id" data-active="@(item.Status is LeaverStatus.Pending or LeaverStatus.Scheduled ? "true" : "false")">
+                    <td>
+                        @if (isCancelled)
+                        {
+                            @item.LeaverDisplayName
+                        }
+                        else
+                        {
+                            <a asp-page="Details" asp-route-id="@item.Id">@item.LeaverDisplayName</a>
+                        }
+                        <br />
+                        <small>@item.Department</small>
+                    </td>
+                    <td>@item.LeavingDate.ToString("dd/MM/yyyy")</td>
+                    @if (Model.ShowExpanded)
+                    {
+                        <td class="table-notes pre-line">@item.EquipmentNotes</td>
+                        <td>
+                            @item.SubmittedByName<br />
+                            <small>@item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                        </td>
+                    }
+                    <td class="status-cell">
+                        <span data-status-label>@statusLabel</span>
+                        @if (item.DisableAsap)
+                        {
+                            <span class="asap-badge" data-asap-badge>Urgent</span>
+                        }
+                        else
+                        {
+                            <span class="asap-badge" data-asap-badge hidden>Urgent</span>
+                        }
+                        <small class="@detailClass" data-status-detail>@statusDetail</small>
+                    </td>
+                    @if (Model.CanManageRequests)
+                    {
+                        <td>
+                            @if (!isCancelled)
+                            {
+                                @if (Model.CanEditRequest(item))
+                                {
+                                    <a asp-page="Edit" asp-route-id="@item.Id">Edit</a>
+                                }
+                                @if (Model.CanRetryRequest(item))
+                                {
+                                    <form method="post" asp-page="Retry" asp-route-id="@item.Id" style="display:inline" data-retry-action>
+                                        <button class="btn-link" type="submit">Try again</button>
+                                    </form>
+                                }
+                            }
+                            else
+                            {
+                                <span class="muted-text">Cancelled</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/leaver-list.js" asp-append-version="true"></script>
+}

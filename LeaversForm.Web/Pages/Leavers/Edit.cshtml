@@ -1,0 +1,4 @@
+@page "{id:int}"
+@model LeaversForm.Web.Pages.Leavers.EditModel
+@{ViewData["Title"]="Edit request";}
+<div class="card"><h1>Edit leaving date</h1><div asp-validation-summary="All"></div><form method="post"><label asp-for="LeavingDate"></label><input asp-for="LeavingDate" type="date" /><button class="btn btn-accent" type="submit">Save</button></form></div>

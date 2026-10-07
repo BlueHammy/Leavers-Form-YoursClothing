@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Leavers Form</title>
+
+    <link rel="icon" type="image/png" href="~/images/yours-logo.png" asp-append-version="true" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <div class="app-bg" aria-hidden="true">
+        <div class="app-bg__base"></div>
+        <div class="app-bg__spark app-bg__spark--1"></div>
+        <div class="app-bg__spark app-bg__spark--3"></div>
+        <div class="app-bg__spark app-bg__spark--5"></div>
+        <div class="app-bg__spark app-bg__spark--7"></div>
+        <div class="app-bg__spark app-bg__spark--2"></div>
+        <div class="app-bg__spark app-bg__spark--4"></div>
+        <div class="app-bg__spark app-bg__spark--6"></div>
+        <div class="app-bg__veil"></div>
+    </div>
+
+    <div class="app-content">
+        <header class="topbar">
+        <a class="brand-lockup" asp-page="/Leavers/List">
+
+            <img src="~/images/yours-logo.png" alt="Yours Clothing" class="brand-logo" asp-append-version="true" />
+
+            <span class="brand-title">Leavers Form</span>
+
+        </a>
+
+        <nav>
+
+            @if (User.Identity?.IsAuthenticated == true)
+
+            {
+
+                <a asp-page="/Leavers/List">Requests</a>
+
+                <a asp-page="/Leavers/Create">Submit</a>
+
+                @if (LeaversForm.Services.LeaversRoles.CanManageExclusions(User))
+
+                {
+
+                    <details class="nav-admin-menu">
+
+                        <summary>Admin</summary>
+
+                        <div class="nav-admin-links">
+
+                            <a asp-page="/Leavers/Ops">Processing settings</a>
+
+                            <a asp-page="/Leavers/Exclusions">Blocked accounts</a>
+
+                            @if (LeaversForm.Services.LeaversRoles.CanManageAppRoles(User))
+
+                            {
+
+                                <a asp-page="/Leavers/Roles">User roles</a>
+
+                            }
+
+                        </div>
+
+                    </details>
+
+                }
+
+                <span class="nav-user">@User.Identity?.Name</span>
+
+                <form method="post" asp-page="/Account/Logout" class="nav-signout-form">
+
+                    <button type="submit" class="btn-link">Sign out</button>
+
+                </form>
+
+            }
+
+            else
+
+            {
+
+                <a asp-page="/Account/Login">Sign in</a>
+
+            }
+
+        </nav>
+
+    </header>
+
+    @if (LeaversForm.Web.AuthMode.UseDevelopmentBypass(
+
+            Context.RequestServices.GetRequiredService<IWebHostEnvironment>(),
+
+            Context.RequestServices.GetRequiredService<IConfiguration>()))
+
+    {
+
+        <div class="banner">Development auth bypass is active — you are auto-signed in as Michael Newton. Configure Azure AD secrets for real SSO.</div>
+
+    }
+
+    @if (LeaversForm.Services.LeaversRoles.IsAdminOrAbove(User))
+
+    {
+
+        var processingMode = Context.RequestServices.GetService<LeaversForm.Services.ILeaversFormProcessingModeService>();
+
+        if (processingMode?.IsScriptTestModeEffective == true)
+
+        {
+
+            <div class="banner banner-danger">Test mode — accounts are not being disabled. <a asp-page="/Leavers/Ops" class="banner-link">Open processing settings</a></div>
+
+        }
+
+    }
+
+    @if (TempData["Success"] is string successMessage) { <div class="banner banner-success">@successMessage</div> }
+
+    @if (TempData["Warning"] is string warningMessage) { <div class="banner banner-warning">@warningMessage</div> }
+
+    <div class="container page-shell">
+
+        <main role="main" class="pb-3">
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    </div><!-- /.app-content -->
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,11 @@
+@page
+@model LeaversForm.Web.Pages.Account.SignedOutModel
+@{ ViewData["Title"] = "Signed out"; }
+<div class="card form-card login-card">
+    <div class="login-brand">
+        <img src="~/images/yours-logo.png" alt="Yours Clothing" class="login-logo" asp-append-version="true" />
+        <h1>Signed out</h1>
+        <p class="muted">You have been signed out of Leavers Form.</p>
+    </div>
+    <a class="btn" asp-page="/Account/Login" asp-route-reauth="true">Sign in again</a>
+</div>

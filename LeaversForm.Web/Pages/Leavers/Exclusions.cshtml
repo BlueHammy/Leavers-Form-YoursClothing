@@ -1,0 +1,71 @@
+@page
+@model LeaversForm.Web.Pages.Leavers.ExclusionsModel
+@using LeaversForm.Data.Enums
+@{ ViewData["Title"] = "Blocked accounts"; }
+<div class="toolbar">
+    <h1>Blocked accounts</h1>
+    <a class="btn" asp-page="List">Back to requests</a>
+</div>
+<p class="muted">Accounts matching these rules cannot be submitted as leavers.</p>
+
+<div class="card form-card">
+    <h2>Add exclusion</h2>
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <form method="post" asp-page-handler="Add">
+        <div class="form-field">
+            <label asp-for="Input.MatchType"></label>
+            <select asp-for="Input.MatchType" asp-items="Html.GetEnumSelectList<LeaverExclusionMatchType>()"></select>
+        </div>
+        <div class="form-field">
+            <label asp-for="Input.MatchValue">Value</label>
+            <input asp-for="Input.MatchValue" placeholder="e.g. ADM_, Michael Newton, CST" />
+            <span asp-validation-for="Input.MatchValue" class="field-validation-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Input.Description">Notes (optional)</label>
+            <input asp-for="Input.Description" placeholder="Why this is excluded" />
+        </div>
+        <button class="btn btn-accent" type="submit">Add exclusion</button>
+    </form>
+</div>
+
+<br />
+
+<div class="card table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Notes</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="4">No active exclusions.</td></tr>
+            }
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@ExclusionsModel.DescribeMatchType(item.MatchType)</td>
+                    <td>@item.MatchValue</td>
+                    <td>@item.Description</td>
+                    <td>
+                        <form method="post" asp-page-handler="Remove" asp-route-id="@item.Id" onsubmit="return confirm('Remove this exclusion?');">
+                            <button class="btn btn-danger" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="muted match-type-help">
+    <strong>Account prefix</strong> matches UPN or samAccountName starting with the value (e.g. ADM_).<br />
+    <strong>Exact display name</strong> matches the leaver name only.<br />
+    <strong>Exact email or UPN</strong> matches the email address or sign-in name.<br />
+    <strong>Contains text</strong> matches if the text appears anywhere in the name, email, or UPN (e.g. CST).
+</p>
