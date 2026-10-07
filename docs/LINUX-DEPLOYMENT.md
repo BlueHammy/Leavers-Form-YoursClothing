@@ -16,11 +16,19 @@ For the frozen Windows/IIS version, use branch **`legacy/windows-iis-working`** 
 sudo ./deploy/linux/install-prerequisites.sh
 ```
 
-**`dotnet: command not found`** — run the install script above (publish needs the **SDK**, not runtime only). Then `git pull` and retry `./deploy/linux/publish-local.sh`. Writing to `/opt/leaversform/app` may need:
+**`dotnet: command not found`** — run the install script (needs **SDK** for publish). If apt fails (non-Ubuntu VM), the script falls back to Microsoft’s install script into `/usr/share/dotnet` and `/usr/local/bin/dotnet`:
 
 ```bash
+git pull origin main
+sudo ./deploy/linux/install-prerequisites.sh
+source /etc/profile.d/dotnet.sh
+dotnet --list-sdks    # must show 8.x
 sudo ./deploy/linux/publish-local.sh /opt/leaversform/app
 ```
+
+Still stuck? Run `./deploy/linux/diagnose-environment.sh` and check the script output.
+
+**Git pull blocked** on `publish-local.sh`: discard VM edits — `git checkout -- deploy/linux/publish-local.sh` then `git pull`.
 
 ## 2. Layout
 

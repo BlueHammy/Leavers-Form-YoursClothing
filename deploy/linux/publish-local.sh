@@ -14,6 +14,7 @@ find_dotnet() {
     return 0
   fi
   for candidate in \
+    /usr/local/bin/dotnet \
     /usr/bin/dotnet \
     /usr/share/dotnet/dotnet \
     "$HOME/.dotnet/dotnet" \
