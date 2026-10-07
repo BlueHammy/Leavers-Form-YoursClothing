@@ -38,7 +38,7 @@ try {
 
     Write-Host ""
     Write-Host "Done. In GitHub repo Settings, set Display name to: Leavers Form YoursClothing" -ForegroundColor Green
-    Write-Host "Next: docs/GITHUB-VM-SYNC.md — install self-hosted runner on the VM." -ForegroundColor Green
+    Write-Host "Next: docs/GITHUB-VM-SYNC.md - install self-hosted runner on the VM." -ForegroundColor Green
 }
 finally {
     Pop-Location
