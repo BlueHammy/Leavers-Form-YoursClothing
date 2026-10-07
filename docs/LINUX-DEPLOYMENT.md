@@ -4,6 +4,18 @@ LeaversForm runs on **ASP.NET Core 8** under **systemd + nginx**. Offboarding st
 
 For the frozen Windows/IIS version, use branch **`legacy/windows-iis-working`** or tag **`windows-iis-v1`**.
 
+## Quick start
+
+[`Final-Build.sh`](../Final-Build.sh) is the Linux equivalent of `Final-Build.ps1`. On Ubuntu it installs the .NET 8 SDK, nginx, and PowerShell 7, publishes the site, and starts it under systemd.
+
+```bash
+sudo ./Final-Build.sh
+```
+
+Open `http://<this-machine>/`. That default is a **test host**: SQLite, script and email test mode on, and development sign-in when the Entra tenant is empty. Leaver accounts are not disabled.
+
+Live hosting uses the same script with `--live` and the same Entra, SQL, and domain-controller values as `Final-Build.ps1`. Run `sudo ./Final-Build.sh --help` for the flags. The script writes `/opt/leaversform/FINAL-SETUP-CHECKLIST.txt` when it finishes.
+
 ## 1. VM prerequisites
 
 - Ubuntu 22.04+ (or similar), .NET 8 runtime + ASP.NET Core runtime

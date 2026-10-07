@@ -30,10 +30,12 @@ jobs:
       - name: Preserve server secrets
         run: |
           APP="${{ vars.LINUX_APP_PATH }}"
-          SECRETS="/etc/leaversform/secrets/appsettings.Production.local.json"
-          if [ -f "$SECRETS" ]; then
-            cp "$SECRETS" "$APP/appsettings.Production.local.json"
-          fi
+          for name in appsettings.Production.local.json appsettings.Development.local.json; do
+            SECRETS="/etc/leaversform/secrets/$name"
+            if [ -f "$SECRETS" ]; then
+              cp "$SECRETS" "$APP/$name"
+            fi
+          done
 
       - name: Restart service
         run: sudo systemctl restart leaversform
