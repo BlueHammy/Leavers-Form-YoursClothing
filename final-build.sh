@@ -2,11 +2,11 @@
 # Linux equivalent of Final-Build.ps1.
 #
 # Test host (default): SQLite, script/email test mode, development sign-in.
-#   sudo ./Final-Build.sh
+#   sudo bash final-build.sh
 #   Then open http://<this-machine>/
 #
 # Live host (Entra SSO, real offboarding — same job as Final-Build.ps1):
-#   sudo ./Final-Build.sh --live \
+#   sudo bash final-build.sh --live \
 #     --host-name leavers.internal.yoursclothing.co.uk \
 #     --tenant-id 00000000-0000-0000-0000-000000000000 \
 #     --client-id 00000000-0000-0000-0000-000000000000 \
@@ -47,7 +47,7 @@ RECREATE_CERT=0
 
 usage() {
   cat <<'EOF'
-Usage: sudo ./Final-Build.sh [options]
+Usage: sudo bash final-build.sh [options]
 
 Default (no --live) hosts a test site:
   SQLite database, ScriptTestMode and EmailTestMode on, development sign-in.
