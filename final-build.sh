@@ -363,7 +363,10 @@ Environment=DOTNET_NOLOGO=1
 WantedBy=multi-user.target
 EOF
 
-chown -R www-data:www-data "$APP_PATH" "$LOG_DIR"
+# Development mode creates /opt/leaversform/logs and /opt/leaversform/scripts
+# as the service user. Those directories must exist and be writable by www-data.
+mkdir -p /opt/leaversform/logs /opt/leaversform/scripts "$LOG_DIR"
+chown -R www-data:www-data /opt/leaversform/logs /opt/leaversform/scripts "$APP_PATH" "$LOG_DIR"
 chown root:www-data "$SECRETS_DIR" "$PFX_PATH" "$SETTINGS_PATH" "${APP_PATH}/${SETTINGS_NAME}" 2>/dev/null || true
 chmod 750 "$APP_PATH" "$LOG_DIR" "$SECRETS_DIR"
 chmod 640 "$SETTINGS_PATH" "${APP_PATH}/${SETTINGS_NAME}"
