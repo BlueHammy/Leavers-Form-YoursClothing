@@ -19,6 +19,8 @@ Open `http://<this-machine>/`. That default is a **test host**: SQLite, script a
 
 Live hosting uses the same script with `--live` and the same Entra, SQL, and domain-controller values as `Final-Build.ps1`. Run `sudo bash final-build.sh --help` for the flags. The script writes `/opt/leaversform/FINAL-SETUP-CHECKLIST.txt` when it finishes.
 
+To connect a running test site to Entra sign-in, Exchange, and on-prem AD, follow **[Connect the Linux site to Entra](LINUX-ENTRA-SETUP.md)**. Keep script test mode on until that guide says to turn it off.
+
 ## 1. VM prerequisites
 
 - Ubuntu 22.04+ (or similar), .NET 8 runtime + ASP.NET Core runtime
