@@ -45,12 +45,15 @@ echo "Using: $DOTNET ($("$DOTNET" --version))"
 
 "$DOTNET" publish "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release -o "$OUT"
 
-SCRIPTS_DIR="/opt/leaversform/scripts"
-if [[ -w "$SCRIPTS_DIR" ]] || [[ "${EUID:-}" -eq 0 ]]; then
-  mkdir -p "$SCRIPTS_DIR"
-  cp -f "$OUT/LeaverProcess.ps1" "$SCRIPTS_DIR/" 2>/dev/null || cp -f "$ROOT/scripts/LeaverProcess.ps1" "$SCRIPTS_DIR/"
+if [[ -w /opt/leaversform/scripts ]] || [[ "${EUID:-}" -eq 0 ]]; then
+  bash "$(dirname "$0")/sync-scripts.sh" /opt/leaversform/scripts 2>/dev/null || {
+    SCRIPTS_DIR="/opt/leaversform/scripts"
+    mkdir -p "$SCRIPTS_DIR"
+    cp -f "$OUT/LeaverProcess.ps1" "$SCRIPTS_DIR/" 2>/dev/null || cp -f "$ROOT/scripts/LeaverProcess.ps1" "$SCRIPTS_DIR/"
+    cp -f "$OUT/LeaversForm-ModuleBootstrap.ps1" "$SCRIPTS_DIR/" 2>/dev/null || cp -f "$ROOT/scripts/LeaversForm-ModuleBootstrap.ps1" "$SCRIPTS_DIR/"
+  }
 else
-  echo "Note: could not write $SCRIPTS_DIR — run: sudo mkdir -p $SCRIPTS_DIR && sudo cp $OUT/LeaverProcess.ps1 $SCRIPTS_DIR/"
+  echo "Note: run as root to sync /opt/leaversform/scripts (deploy/linux/sync-scripts.sh)"
 fi
 
 echo "Done. Restart: sudo systemctl restart leaversform"

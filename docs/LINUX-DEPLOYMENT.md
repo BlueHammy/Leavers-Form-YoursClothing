@@ -10,6 +10,18 @@ For the frozen Windows/IIS version, use branch **`legacy/windows-iis-working`** 
 
 Run it from the repository directory. Linux will not find it as a bare command.
 
+**After `git checkout` on an existing VM**, prefer the lighter sync script (does not replace secrets that already exist):
+
+```bash
+cd ~/Source/Leavers-Form-YoursClothing
+git fetch origin && git checkout bluehammy/linux-final-build-fb33 && git pull
+sudo bash deploy/linux/setup-from-git.sh --skip-tests --bind-lan
+```
+
+See [deploy/linux/README.md](../deploy/linux/README.md) for script details.
+
+First-time or full rebuild:
+
 ```bash
 cd /path/to/Leavers-Form-YoursClothing
 sudo bash final-build.sh

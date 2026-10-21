@@ -242,19 +242,37 @@ function Get-AutomationCertificate {
         [string]$Thumbprint
     )
 
-    $cleanThumbprint = $Thumbprint -replace "\s", ""
+    $cleanThumbprint = ($Thumbprint -replace "\s", "").ToUpperInvariant()
 
     $cert = $null
     foreach ($storePath in @('Cert:\CurrentUser\My', 'Cert:\LocalMachine\My')) {
         if (-not (Test-Path $storePath)) { continue }
         $cert = Get-ChildItem -Path $storePath -ErrorAction SilentlyContinue |
-            Where-Object { $_.Thumbprint -ieq $cleanThumbprint } |
+            Where-Object { ($_.Thumbprint -replace "\s", "").ToUpperInvariant() -eq $cleanThumbprint } |
             Select-Object -First 1
         if ($cert) { break }
     }
 
     if (-not $cert) {
-        throw "Certificate with thumbprint '$Thumbprint' was not found in Cert:\CurrentUser\My or Cert:\LocalMachine\My."
+        $pfxPath = $env:LEAVERSFORM_PS_CERTIFICATE_PATH
+        if ($pfxPath -and (Test-Path -LiteralPath $pfxPath)) {
+            $password = $env:LEAVERSFORM_PS_CERTIFICATE_PASSWORD
+            if ($password) {
+                $secure = ConvertTo-SecureString $password -AsPlainText -Force
+                $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($pfxPath, $secure)
+            }
+            else {
+                $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($pfxPath)
+            }
+            $actual = ($cert.Thumbprint -replace "\s", "").ToUpperInvariant()
+            if ($actual -ne $cleanThumbprint) {
+                throw "Certificate at '$pfxPath' has thumbprint '$($cert.Thumbprint)', expected '$Thumbprint'."
+            }
+        }
+    }
+
+    if (-not $cert) {
+        throw "Certificate with thumbprint '$Thumbprint' was not found in Cert:\CurrentUser\My, Cert:\LocalMachine\My, or LEAVERSFORM_PS_CERTIFICATE_PATH."
     }
 
     if (-not $cert.HasPrivateKey) {

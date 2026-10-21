@@ -217,8 +217,30 @@ You want: `ScriptTestMode is ENABLED — leaver accounts will NOT be disabled.`
 
 Install the PowerShell modules the offboarding script uses, then do a dry run. `-WhatIf` must not change the mailbox or the account. On this VM the on-prem AD cmdlets will fail because the Windows module is missing. Graph and Exchange are the part you are checking.
 
+After a git pull, sync scripts and app bits with:
+
+```bash
+sudo bash deploy/linux/setup-from-git.sh --skip-tests --bind-lan
+```
+
+Optional: import the PFX into the machine cert store (the script also reads `LEAVERSFORM_PS_CERTIFICATE_PATH` from your JSON when run via the web app or `test-leaver-whatif.sh`):
+
+```bash
+sudo bash deploy/linux/import-automation-pfx.sh /etc/leaversform/secrets/automation-new.pfx
+```
+
+Or use the helper (reads thumbprint and paths from `appsettings.Development.local.json`):
+
+```bash
+sudo bash deploy/linux/test-leaver-whatif.sh real.user@yoursclothing.co.uk SAMNAME
+```
+
+Manual `pwsh` example:
+
 ```bash
 sudo pwsh -NoProfile -Command 'Set-PSRepository PSGallery -InstallationPolicy Trusted; Install-Module ExchangeOnlineManagement,Microsoft.Graph.Authentication,Microsoft.Graph.Users,Microsoft.Graph.Users.Actions,Microsoft.Graph.Groups,Microsoft.Graph.Identity.DirectoryManagement,Microsoft.Graph.Applications -Scope AllUsers -Force'
+export LEAVERSFORM_PS_CERTIFICATE_PATH=/etc/leaversform/secrets/automation-new.pfx
+export LEAVERSFORM_PS_CERTIFICATE_PASSWORD=LeaversForm-Cert-Backup
 sudo pwsh -NoProfile -File /opt/leaversform/scripts/LeaverProcess.ps1 \
   -UserPrincipalName 'TEST-USER@yoursclothing.co.uk' \
   -SamAccountName 'TEST-SAM' \
