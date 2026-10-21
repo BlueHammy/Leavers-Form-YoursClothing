@@ -55,7 +55,8 @@ if [[ -d "$OUT" ]]; then
 fi
 mkdir -p "$OUT"
 
-"$DOTNET" publish "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release -o "$OUT" --no-incremental
+"$DOTNET" clean "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release --nologo -v q
+"$DOTNET" publish "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release -o "$OUT" --nologo
 
 for keep in appsettings.Development.local.json appsettings.Production.local.json leaversform.db; do
   if [[ -f "${preserve_tmp}/${keep}" ]]; then
