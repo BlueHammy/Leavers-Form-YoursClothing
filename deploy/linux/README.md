@@ -50,3 +50,19 @@ Full Entra / Exchange / AD steps: [docs/LINUX-ENTRA-SETUP.md](../../docs/LINUX-E
 curl -fsSL http://127.0.0.1:5044/ | grep -E 'Leaver requests|Development auth bypass'
 sudo journalctl -u leaversform -n 30 --no-pager | grep ScriptTestMode
 ```
+
+## `git pull` blocked on deploy scripts
+
+If pull aborts because `deploy/linux/*.sh` was edited on the VM, keep the branch versions (recommended):
+
+```bash
+git checkout -- deploy/linux/diagnose-environment.sh deploy/linux/install-prerequisites.sh deploy/linux/publish-local.sh
+git pull origin bluehammy/linux-final-build-fb33
+```
+
+To keep a copy of your VM edits first:
+
+```bash
+git stash push -m "vm deploy scripts" -- deploy/linux/
+git pull origin bluehammy/linux-final-build-fb33
+```
