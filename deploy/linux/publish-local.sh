@@ -43,7 +43,26 @@ fi
 echo "Publishing LeaversForm.Web to $OUT ..."
 echo "Using: $DOTNET ($("$DOTNET" --version))"
 
-"$DOTNET" publish "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release -o "$OUT"
+# Stale DLLs left from older publishes cause MissingMethodException at runtime.
+preserve_tmp="$(mktemp -d)"
+for keep in appsettings.Development.local.json appsettings.Production.local.json leaversform.db; do
+  if [[ -f "${OUT}/${keep}" ]]; then
+    cp -a "${OUT}/${keep}" "${preserve_tmp}/${keep}"
+  fi
+done
+if [[ -d "$OUT" ]]; then
+  rm -rf "${OUT:?}"/*
+fi
+mkdir -p "$OUT"
+
+"$DOTNET" publish "$ROOT/LeaversForm.Web/LeaversForm.Web.csproj" -c Release -o "$OUT" --no-incremental
+
+for keep in appsettings.Development.local.json appsettings.Production.local.json leaversform.db; do
+  if [[ -f "${preserve_tmp}/${keep}" ]]; then
+    cp -a "${preserve_tmp}/${keep}" "${OUT}/${keep}"
+  fi
+done
+rm -rf "$preserve_tmp"
 
 if [[ -w /opt/leaversform/scripts ]] || [[ "${EUID:-}" -eq 0 ]]; then
   bash "$(dirname "$0")/sync-scripts.sh" /opt/leaversform/scripts 2>/dev/null || {

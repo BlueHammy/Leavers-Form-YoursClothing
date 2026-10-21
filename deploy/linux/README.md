@@ -51,6 +51,17 @@ curl -fsSL http://127.0.0.1:5044/ | grep -E 'Leaver requests|Development auth by
 sudo journalctl -u leaversform -n 30 --no-pager | grep ScriptTestMode
 ```
 
+## HTTP 500 / `MissingMethodException` on `/Leavers/List`
+
+Usually **stale DLLs** in `/opt/leaversform/app` from an older publish. Re-publish (the script clears the folder but keeps local settings and `leaversform.db`):
+
+```bash
+cd ~/Source/Leavers-Form-YoursClothing
+sudo bash deploy/linux/publish-local.sh /opt/leaversform/app
+sudo cp /etc/leaversform/secrets/appsettings.Development.local.json /opt/leaversform/app/ 2>/dev/null || true
+sudo systemctl restart leaversform
+```
+
 ## `git pull` blocked on deploy scripts
 
 If pull aborts because `deploy/linux/*.sh` was edited on the VM, keep the branch versions (recommended):
