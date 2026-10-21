@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # Shared helpers for Linux deploy scripts. Source from deploy/linux/*.sh only.
 
+# Ubuntu's Microsoft dotnet package ships /etc/profile.d/dotnet.sh, which can
+# reference optional vars and break under bash nounset (set -u).
+safe_source() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+  set +u
+  # shellcheck disable=SC1090
+  source "$file"
+  set -u
+}
+
 find_dotnet() {
   if [[ -n "${DOTNET_ROOT:-}" && -x "${DOTNET_ROOT}/dotnet" ]]; then
     echo "${DOTNET_ROOT}/dotnet"

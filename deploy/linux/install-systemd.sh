@@ -9,10 +9,7 @@ APP_PATH="${1:-/opt/leaversform/app}"
 ASPNET_ENV="${2:-Development}"
 BIND_ALL="${3:-0}" # 1 = 0.0.0.0:5044 for LAN browser tests
 
-if [[ -f /etc/profile.d/dotnet.sh ]]; then
-  # shellcheck disable=SC1091
-  source /etc/profile.d/dotnet.sh
-fi
+safe_source /etc/profile.d/dotnet.sh
 
 DOTNET="$(find_dotnet)"
 if [[ -z "$DOTNET" ]]; then

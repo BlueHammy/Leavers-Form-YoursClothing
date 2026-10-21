@@ -151,10 +151,15 @@ SETTINGS_PATH="${SECRETS_DIR}/${SETTINGS_NAME}"
 step "Installing prerequisites (.NET 8 SDK, nginx, pwsh)"
 bash "${ROOT}/deploy/linux/install-prerequisites.sh"
 
-if [[ -f /etc/profile.d/dotnet.sh ]]; then
-  # shellcheck disable=SC1091
-  source /etc/profile.d/dotnet.sh
-fi
+safe_source() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+  set +u
+  # shellcheck disable=SC1090
+  source "$file"
+  set -u
+}
+safe_source /etc/profile.d/dotnet.sh
 
 find_dotnet() {
   if [[ -n "${DOTNET_ROOT:-}" && -x "${DOTNET_ROOT}/dotnet" ]]; then

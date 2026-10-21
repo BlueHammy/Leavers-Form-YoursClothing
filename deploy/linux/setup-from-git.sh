@@ -56,18 +56,15 @@ step() { printf '\n==> %s\n' "$1"; }
 
 HOST_NAME="$(hostname -f 2>/dev/null || hostname)"
 
+# shellcheck source=lib/common.sh
+source "${ROOT}/deploy/linux/lib/common.sh"
+
 if [[ "$SKIP_PREREQ" -eq 0 ]]; then
   step "Prerequisites"
   bash "${ROOT}/deploy/linux/install-prerequisites.sh"
 fi
 
-if [[ -f /etc/profile.d/dotnet.sh ]]; then
-  # shellcheck disable=SC1091
-  source /etc/profile.d/dotnet.sh
-fi
-
-# shellcheck source=lib/common.sh
-source "${ROOT}/deploy/linux/lib/common.sh"
+safe_source /etc/profile.d/dotnet.sh
 DOTNET="$(find_dotnet)"
 if [[ -z "$DOTNET" ]] || ! "$DOTNET" --list-sdks 2>/dev/null | grep -q '^8\.'; then
   echo ".NET 8 SDK required. Run without --skip-prerequisites or install-prerequisites.sh." >&2
