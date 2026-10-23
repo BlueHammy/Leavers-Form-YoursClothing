@@ -62,6 +62,17 @@ sudo cp /etc/leaversform/secrets/appsettings.Development.local.json /opt/leavers
 sudo systemctl restart leaversform
 ```
 
+## HTTPS on port 5044 (Entra test on sh-pp-01)
+
+Kestrel stays on `http://127.0.0.1:5044`. nginx listens on **`5044` with TLS**:
+
+```bash
+sudo bash deploy/linux/install-test-tls-5044.sh
+# or: sudo bash deploy/linux/install-test-tls-5044.sh --host sh-pp-01
+```
+
+Then set `LeaversForm:BaseUrl` to `https://sh-pp-01:5044`, add matching redirect URIs in Entra, restart the service, and browse **https** (not http).
+
 ## `git pull` blocked on deploy scripts
 
 If pull aborts because `deploy/linux/*.sh` was edited on the VM, keep the branch versions (recommended):
