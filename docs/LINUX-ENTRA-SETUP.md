@@ -45,10 +45,17 @@ Use the existing Leavers Form web app in [Entra admin centre](https://entra.micr
 
 **App registrations → your web app → Authentication → Add a platform → Web** (not Single-page application).
 
-Add these redirect URIs:
+Add these redirect URIs.
 
-- `http://sh-pp-01:5044/signin-oidc`
-- `http://sh-pp-01:5044/signout-callback-oidc`
+**Non-localhost must use HTTPS** in Entra (Microsoft no longer allows `http://` except for `localhost`). Put TLS on **nginx** (port 443), keep Kestrel on `127.0.0.1:5044`, and open the site as `https://your-dns-name/` (not `:5044`). See `deploy/linux/nginx-leaversform-ssl.conf.example`.
+
+Example HTTPS URIs (hostname must match your certificate and `LeaversForm:BaseUrl`):
+
+- `https://leavers.yoursclothing.co.uk/signin-oidc`
+- `https://leavers.yoursclothing.co.uk/signout-callback-oidc`
+
+Local dev only:
+
 - `http://localhost:5044/signin-oidc`
 - `http://localhost:5044/signout-callback-oidc`
 
