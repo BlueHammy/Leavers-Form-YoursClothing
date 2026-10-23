@@ -64,7 +64,7 @@ sudo systemctl restart leaversform
 
 ## HTTPS on port 5044 (Entra test on sh-pp-01)
 
-Kestrel stays on `http://127.0.0.1:5044`. nginx listens on **`5044` with TLS**:
+nginx listens on **`5044` with TLS**; Kestrel stays on **`http://127.0.0.1:5045`** (same port would loop inside nginx):
 
 ```bash
 sudo bash deploy/linux/install-test-tls-5044.sh

@@ -7,7 +7,8 @@ source "$(dirname "$0")/lib/common.sh"
 
 APP_PATH="${1:-/opt/leaversform/app}"
 ASPNET_ENV="${2:-Development}"
-BIND_ALL="${3:-0}" # 1 = 0.0.0.0:5044 for LAN browser tests
+BIND_ALL="${3:-0}" # 1 = listen on all interfaces (direct HTTP, no nginx TLS on same port)
+BACKEND_PORT="${4:-5044}" # use 5045 when nginx terminates TLS on 5044
 
 safe_source /etc/profile.d/dotnet.sh
 
@@ -20,9 +21,9 @@ DOTNET="$(resolve_dotnet_root "$DOTNET")"
 DOTNET_ROOT="$(dirname "$DOTNET")"
 
 if [[ "$BIND_ALL" == "1" ]]; then
-  APP_URLS="http://0.0.0.0:5044"
+  APP_URLS="http://0.0.0.0:${BACKEND_PORT}"
 else
-  APP_URLS="http://127.0.0.1:5044"
+  APP_URLS="http://127.0.0.1:${BACKEND_PORT}"
 fi
 
 cat > /etc/systemd/system/leaversform.service <<EOF
