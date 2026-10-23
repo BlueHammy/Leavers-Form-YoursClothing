@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # HTTPS on port 5044 for Entra testing (https://sh-pp-01:5044/...).
 #
-# Kestrel must listen ONLY on 127.0.0.1:5044; nginx owns 5044 with TLS.
+# nginx owns 5044 (TLS). Kestrel uses 127.0.0.1:5045 so proxy_pass does not loop back into nginx.
+BACKEND_PORT=5045
 #
 #   sudo bash deploy/linux/install-test-tls-5044.sh
 #   sudo bash deploy/linux/install-test-tls-5044.sh --host sh-pp-01.yoursclothing.co.uk
