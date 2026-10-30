@@ -181,11 +181,10 @@ if ! "$DOTNET" --list-sdks 2>/dev/null | grep -q '^8\.'; then
   echo ".NET 8 SDK was not found after install-prerequisites.sh" >&2
   exit 1
 fi
-sdk_dir="$("$DOTNET" --list-sdks 2>/dev/null | awk '/^8\./ { gsub(/[\[\]]/, "", $2); print $2; exit }')"
-DOTNET_ROOT="$(dirname "$sdk_dir")"
-if [[ -x "${DOTNET_ROOT}/dotnet" ]]; then
-  DOTNET="${DOTNET_ROOT}/dotnet"
+if command -v readlink >/dev/null 2>&1; then
+  DOTNET="$(readlink -f "$DOTNET")"
 fi
+DOTNET_ROOT="$(dirname "$DOTNET")"
 
 if ! command -v python3 >/dev/null 2>&1; then
   apt-get update

@@ -27,12 +27,14 @@ find_dotnet() {
   command -v dotnet 2>/dev/null || true
 }
 
-resolve_dotnet_root() {
+# Real path to the dotnet host binary (avoid guessing /usr/lib/dotnet/dotnet when only /usr/bin/dotnet exists).
+canonical_dotnet() {
   local dotnet="$1"
-  local sdk_dir
-  sdk_dir="$("$dotnet" --list-sdks 2>/dev/null | awk '/^8\./ { gsub(/[\[\]]/, "", $2); print $2; exit }')"
-  if [[ -n "$sdk_dir" && -x "${sdk_dir}/dotnet" ]]; then
-    echo "${sdk_dir}/dotnet"
+  if [[ ! -x "$dotnet" ]]; then
+    return 1
+  fi
+  if command -v readlink >/dev/null 2>&1; then
+    readlink -f "$dotnet"
     return 0
   fi
   echo "$dotnet"

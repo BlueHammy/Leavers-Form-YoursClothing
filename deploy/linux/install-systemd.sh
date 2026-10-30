@@ -13,12 +13,17 @@ BACKEND_PORT="${4:-5044}" # use 5045 when nginx terminates TLS on 5044
 safe_source /etc/profile.d/dotnet.sh
 
 DOTNET="$(find_dotnet)"
-if [[ -z "$DOTNET" ]]; then
-  echo "dotnet not found. Run deploy/linux/install-prerequisites.sh first." >&2
+if [[ -z "$DOTNET" ]] || ! [[ -x "$DOTNET" ]]; then
+  echo "dotnet not found. Run: sudo bash deploy/linux/install-prerequisites.sh" >&2
   exit 127
 fi
-DOTNET="$(resolve_dotnet_root "$DOTNET")"
+DOTNET="$(canonical_dotnet "$DOTNET")"
 DOTNET_ROOT="$(dirname "$DOTNET")"
+if [[ ! -x "$DOTNET" ]]; then
+  echo "dotnet is not executable at ${DOTNET}" >&2
+  exit 127
+fi
+echo "Using dotnet: ${DOTNET}"
 
 if [[ "$BIND_ALL" == "1" ]]; then
   APP_URLS="http://0.0.0.0:${BACKEND_PORT}"
