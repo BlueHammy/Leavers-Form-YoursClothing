@@ -7,10 +7,25 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (!OperatingSystem.IsWindows() ||
+    builder.Configuration.GetValue("LeaversForm:BehindReverseProxy", false))
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor |
+            ForwardedHeaders.XForwardedProto |
+            ForwardedHeaders.XForwardedHost;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
 
 if (builder.Environment.EnvironmentName.Equals("SemiLive", StringComparison.OrdinalIgnoreCase))
 {
@@ -186,6 +201,10 @@ else
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+if (!OperatingSystem.IsWindows() ||
+    app.Configuration.GetValue("LeaversForm:BehindReverseProxy", false))
+    app.UseForwardedHeaders();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

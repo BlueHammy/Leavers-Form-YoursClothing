@@ -1,5 +1,111 @@
 {
+  "AllowedHosts": "*",
+  "AzureAd": {
+    "TenantId": "fb7dafa2-fd70-4cee-bcca-40724316b45c",
+    "ClientId": "3fce767c-38ab-48ee-ba49-4e9208f6bf42",
+    "ClientSecret": "~C58Q~JKmFEelysdSuemIBth.9bCNN~NPMp8gbz0"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=leaversform.db"
+  },
+  "Graph": {
+    "EmailTestMode": true,
+    "RedirectAllEmailsTo": ""
+  },
   "LeaversForm": {
-    "BaseUrl": "http://YOUR-PC-NAME:5044"
+    "BaseUrl": "http://sh-pp-01:5044",
+    "EmailTestMode": true,
+    "ScriptTestMode": true,
+    "LogFolderPath": "/opt/leaversform/logs",
+    "PowerShellTenantId": "fb7dafa2-fd70-4cee-bcca-40724316b45c",
+    "PowerShellAppId": "3fce767c-38ab-48ee-ba49-4e9208f6bf42",
+    "PowerShellCertificateThumbprint": "51033DC82483718A5F3F5E5EC9A6EC06288ACB01",
+    "PowerShellCertificatePath": "/etc/leaversform/secrets/automation-new.pfx",
+    "PowerShellExchangeOrganization": "yoursclothing.onmicrosoft.com",
+    "PowerShellDomainController": "SH-DC-01",
+    "PowerShellExecutable": "pwsh",
+    "PowerShellScriptPath": "/opt/leaversform/scripts/LeaverProcess.ps1",
+    "PowerShellWorkingDirectory": "/opt/leaversform/scripts"
   }
 }
+
+
+right first
+
+An unhandled exception occurred while processing the request.
+SocketException: Resource temporarily unavailable
+
+System.Net.Sockets.Socket+AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+HttpRequestException: Resource temporarily unavailable (login.microsoftonline.com:443)
+
+System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(string host, int port, HttpRequestMessage initialRequest, bool async, CancellationToken cancellationToken)
+IOException: IDX20804: Unable to retrieve document from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'.
+
+Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(string address, CancellationToken cancel)
+InvalidOperationException: IDX20803: Unable to obtain configuration from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'. Will retry at '1/1/0001 12:00:00 AM +00:00'. Exception: 'System.IO.IOException: IDX20804: Unable to retrieve document from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'.\n ---> System.Net.Http.HttpRequestException: Resource temporarily unavailable (login.microsoftonline.com:443)\n ---> System.Net.Sockets.SocketException (11): Resource temporarily unavailable\n at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)\n at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)\n --- End of inner exception stack trace ---\n at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)\n at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.SendAndRetryOnNetworkErrorAsync(HttpClient httpClient, Uri uri)\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(String address, CancellationToken cancel)\n --- End of inner exception stack trace ---\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(String address, CancellationToken cancel)\n at Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfigurationRetriever.GetAsync(String address, IDocumentRetriever retriever, CancellationToken cancel)\n at Microsoft.IdentityModel.Protocols.ConfigurationManager`1.GetConfigurationNonBlockingAsync(CancellationToken cancel)'.
+
+Microsoft.IdentityModel.Protocols.ConfigurationManager<T>.GetConfigurationNonBlockingAsync(CancellationToken cancel)
+
+    Stack Query Cookies Headers Routing 
+
+    SocketException: Resource temporarily unavailable
+        System.Net.Sockets.Socket+AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+        System.Net.Sockets.Socket+AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(short token)
+        System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+        System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(string host, int port, HttpRequestMessage initialRequest, bool async, CancellationToken cancellationToken)
+
+    Show raw exception details
+    HttpRequestException: Resource temporarily unavailable (login.microsoftonline.com:443)
+        System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(string host, int port, HttpRequestMessage initialRequest, bool async, CancellationToken cancellationToken)
+        System.Threading.Tasks.ValueTask<TResult>.get_Result()
+        System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, bool async, CancellationToken cancellationToken)
+        System.Threading.Tasks.ValueTask<TResult>.get_Result()
+        System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable<TResult>+ConfiguredValueTaskAwaiter.GetResult()
+        System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, bool async, CancellationToken cancellationToken)
+        System.Threading.Tasks.ValueTask<TResult>.get_Result()
+        System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+        System.Threading.Tasks.TaskCompletionSourceWithCancellation<T>.WaitWithCancellationAsync(CancellationToken cancellationToken)
+        System.Threading.Tasks.ValueTask<TResult>.get_Result()
+        System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, bool async, bool doRequestAuth, CancellationToken cancellationToken)
+        System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, bool async, CancellationToken cancellationToken)
+        System.Threading.Tasks.ValueTask<TResult>.get_Result()
+        System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, bool async, CancellationToken cancellationToken)
+        System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, bool disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+        Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.SendAndRetryOnNetworkErrorAsync(HttpClient httpClient, Uri uri)
+        Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(string address, CancellationToken cancel)
+
+    Show raw exception details
+    IOException: IDX20804: Unable to retrieve document from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'.
+        Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(string address, CancellationToken cancel)
+        Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfigurationRetriever.GetAsync(string address, IDocumentRetriever retriever, CancellationToken cancel)
+        Microsoft.IdentityModel.Protocols.ConfigurationManager<T>.GetConfigurationNonBlockingAsync(CancellationToken cancel)
+
+    Show raw exception details
+    InvalidOperationException: IDX20803: Unable to obtain configuration from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'. Will retry at '1/1/0001 12:00:00 AM +00:00'. Exception: 'System.IO.IOException: IDX20804: Unable to retrieve document from: 'https://login.microsoftonline.com/fb7dafa2-fd70-4cee-bcca-40724316b45c/v2.0/.well-known/openid-configuration'.\n ---> System.Net.Http.HttpRequestException: Resource temporarily unavailable (login.microsoftonline.com:443)\n ---> System.Net.Sockets.SocketException (11): Resource temporarily unavailable\n at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)\n at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)\n --- End of inner exception stack trace ---\n at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)\n at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)\n at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.SendAndRetryOnNetworkErrorAsync(HttpClient httpClient, Uri uri)\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(String address, CancellationToken cancel)\n --- End of inner exception stack trace ---\n at Microsoft.IdentityModel.Protocols.HttpDocumentRetriever.GetDocumentAsync(String address, CancellationToken cancel)\n at Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfigurationRetriever.GetAsync(String address, IDocumentRetriever retriever, CancellationToken cancel)\n at Microsoft.IdentityModel.Protocols.ConfigurationManager`1.GetConfigurationNonBlockingAsync(CancellationToken cancel)'.
+        Microsoft.IdentityModel.Protocols.ConfigurationManager<T>.GetConfigurationNonBlockingAsync(CancellationToken cancel)
+        Microsoft.IdentityModel.Protocols.ConfigurationManager<T>.GetConfigurationAsync(CancellationToken cancel)
+        Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectHandler.HandleChallengeAsyncInternal(AuthenticationProperties properties)
+        Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectHandler.HandleChallengeAsync(AuthenticationProperties properties)
+        Microsoft.AspNetCore.Authentication.AuthenticationHandler<TOptions>.ChallengeAsync(AuthenticationProperties properties)
+        Microsoft.AspNetCore.Authentication.AuthenticationService.ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        Microsoft.AspNetCore.Mvc.ChallengeResult.ExecuteResultAsync(ActionContext context)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0<TFilter, TFilterAsync>(ResourceInvoker invoker, Task lastTask, State next, Scope scope, object state, bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext<TFilter, TFilterAsync>(ref State next, ref Scope scope, ref object state, ref bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultFilters>g__Awaited|28_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, object state, bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, object state, bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(ref State next, ref Scope scope, ref object state, ref bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, object state, bool isCompleted)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+        Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+        Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+        Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+        Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+        Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+
+    Show raw exception details
+
+
+
+second why is there an opt folder in root that has the app stuff, but also a leaversform folder in sh-pp-01 file system? which one should i work from? which one gets updated when i pul from github? its confusing me
