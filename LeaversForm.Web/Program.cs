@@ -22,7 +22,7 @@ if (!OperatingSystem.IsWindows() ||
             ForwardedHeaders.XForwardedFor |
             ForwardedHeaders.XForwardedProto |
             ForwardedHeaders.XForwardedHost;
-        options.KnownIPNetworks.Clear();
+        options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
 }
