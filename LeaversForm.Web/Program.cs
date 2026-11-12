@@ -7,10 +7,25 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (!OperatingSystem.IsWindows() ||
+    builder.Configuration.GetValue("LeaversForm:BehindReverseProxy", false))
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor |
+            ForwardedHeaders.XForwardedProto |
+            ForwardedHeaders.XForwardedHost;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
 
 if (builder.Environment.EnvironmentName.Equals("SemiLive", StringComparison.OrdinalIgnoreCase))
 {
@@ -104,7 +119,7 @@ if (useDevelopmentAuth)
 }
 else if (AuthMode.UseEntraSso(builder.Configuration))
 {
-    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(options =>
         {
             builder.Configuration.Bind("AzureAd", options);
@@ -115,6 +130,16 @@ else if (AuthMode.UseEntraSso(builder.Configuration))
             options.SignedOutCallbackPath = "/signout-callback-oidc";
             options.SignedOutRedirectUri = "/Account/SignedOut";
             options.Events ??= new OpenIdConnectEvents();
+            options.Events.OnRedirectToIdentityProvider = context =>
+            {
+                if (context.Properties.Items.TryGetValue("prompt", out var prompt)
+                    && !string.IsNullOrWhiteSpace(prompt))
+                {
+                    context.ProtocolMessage.Prompt = prompt;
+                }
+
+                return Task.CompletedTask;
+            };
             options.Events.OnSignedOutCallbackRedirect = context =>
             {
                 context.Response.Redirect("/Account/SignedOut");
@@ -186,6 +211,10 @@ else
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+if (!OperatingSystem.IsWindows() ||
+    app.Configuration.GetValue("LeaversForm:BehindReverseProxy", false))
+    app.UseForwardedHeaders();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

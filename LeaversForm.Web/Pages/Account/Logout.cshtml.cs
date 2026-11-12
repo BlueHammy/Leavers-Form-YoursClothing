@@ -15,7 +15,7 @@ public class LogoutModel(IWebHostEnvironment environment, IConfiguration configu
     {
         if (AuthMode.UseDevelopmentBypass(environment, configuration))
         {
-            await HttpContext.SignOutAsync("Development");
+            // DevelopmentAuthenticationHandler does not support SignOutAsync; bypass auto-signs in on the next request.
             return RedirectToPage("/Account/SignedOut");
         }
 

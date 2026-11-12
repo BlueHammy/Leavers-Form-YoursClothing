@@ -45,6 +45,8 @@ public sealed class PowerShellScriptExecutor(
             UseShellExecute = false,
             CreateNoWindow = true
         };
+        AddEnvironmentVariable(psi, "LEAVERSFORM_PS_CERTIFICATE_PATH", settings.PowerShellCertificatePath);
+        AddEnvironmentVariable(psi, "LEAVERSFORM_PS_CERTIFICATE_PASSWORD", configuration["LeaversForm:PowerShellCertificatePassword"]);
         psi.ArgumentList.Add("-NoProfile");
         psi.ArgumentList.Add("-ExecutionPolicy");
         psi.ArgumentList.Add("Bypass");
@@ -174,5 +176,11 @@ public sealed class PowerShellScriptExecutor(
             psi.ArgumentList.Add(name);
             psi.ArgumentList.Add(value);
         }
+    }
+
+    private static void AddEnvironmentVariable(ProcessStartInfo psi, string name, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+            psi.Environment[name] = value;
     }
 }

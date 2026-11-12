@@ -4,6 +4,35 @@ LeaversForm runs on **ASP.NET Core 8** under **systemd + nginx**. Offboarding st
 
 For the frozen Windows/IIS version, use branch **`legacy/windows-iis-working`** or tag **`windows-iis-v1`**.
 
+## Quick start
+
+[`final-build.sh`](../final-build.sh) is the Linux equivalent of `Final-Build.ps1`. On Ubuntu it installs the .NET 8 SDK, nginx, and PowerShell 7, publishes the site, and starts it under systemd.
+
+Run it from the repository directory. Linux will not find it as a bare command.
+
+**After `git checkout` on an existing VM**, prefer the lighter sync script (does not replace secrets that already exist):
+
+```bash
+cd ~/Source/Leavers-Form-YoursClothing
+git fetch origin && git checkout bluehammy/linux-final-build-fb33 && git pull
+sudo bash deploy/linux/setup-from-git.sh --skip-tests --bind-lan
+```
+
+See [deploy/linux/README.md](../deploy/linux/README.md) for script details.
+
+First-time or full rebuild:
+
+```bash
+cd /path/to/Leavers-Form-YoursClothing
+sudo bash final-build.sh
+```
+
+Open `http://<this-machine>/`. That default is a **test host**: SQLite, script and email test mode on, and development sign-in when the Entra tenant is empty. Leaver accounts are not disabled.
+
+Live hosting uses the same script with `--live` and the same Entra, SQL, and domain-controller values as `Final-Build.ps1`. Run `sudo bash final-build.sh --help` for the flags. The script writes `/opt/leaversform/FINAL-SETUP-CHECKLIST.txt` when it finishes.
+
+To connect a running test site to Entra sign-in, Exchange, and on-prem AD, follow **[Connect the Linux site to Entra](LINUX-ENTRA-SETUP.md)**. Keep script test mode on until that guide says to turn it off.
+
 ## 1. VM prerequisites
 
 - Ubuntu 22.04+ (or similar), .NET 8 runtime + ASP.NET Core runtime

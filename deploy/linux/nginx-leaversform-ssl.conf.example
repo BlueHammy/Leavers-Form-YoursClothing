@@ -1,0 +1,30 @@
+# HTTPS front door for Entra redirect URIs (non-localhost must be https).
+# 1) Replace __HOST_NAME__ with the DNS name on your TLS certificate (e.g. leavers.yoursclothing.co.uk).
+# 2) Replace __SSL_CERT__ and __SSL_KEY__ with your cert paths (internal CA or public CA).
+# 3) sudo cp this file to /etc/nginx/sites-available/leaversform-ssl and enable it.
+# 4) Redirect plain HTTP to HTTPS (optional but recommended).
+
+server {
+    listen 80;
+    server_name __HOST_NAME__;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name __HOST_NAME__;
+
+    ssl_certificate     __SSL_CERT__;
+    ssl_certificate_key __SSL_KEY__;
+
+    location / {
+        proxy_pass http://127.0.0.1:5044;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
