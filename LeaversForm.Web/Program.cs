@@ -119,7 +119,7 @@ if (useDevelopmentAuth)
 }
 else if (AuthMode.UseEntraSso(builder.Configuration))
 {
-    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(options =>
         {
             builder.Configuration.Bind("AzureAd", options);
@@ -130,6 +130,16 @@ else if (AuthMode.UseEntraSso(builder.Configuration))
             options.SignedOutCallbackPath = "/signout-callback-oidc";
             options.SignedOutRedirectUri = "/Account/SignedOut";
             options.Events ??= new OpenIdConnectEvents();
+            options.Events.OnRedirectToIdentityProvider = context =>
+            {
+                if (context.Properties.Items.TryGetValue("prompt", out var prompt)
+                    && !string.IsNullOrWhiteSpace(prompt))
+                {
+                    context.ProtocolMessage.Prompt = prompt;
+                }
+
+                return Task.CompletedTask;
+            };
             options.Events.OnSignedOutCallbackRedirect = context =>
             {
                 context.Response.Redirect("/Account/SignedOut");
